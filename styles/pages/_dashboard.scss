@@ -1,0 +1,22 @@
+// ===========================================================================
+// Dashboard-specific composition
+// ===========================================================================
+@use "../mixins" as *;
+@use "../variables" as *;
+@use "../media" as *;
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+
+  &__quick {
+    margin-bottom: 4px;
+  }
+}
+
+.env-line {
+  @include flex(row, flex-start, center, 7px);
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-muted);
+}

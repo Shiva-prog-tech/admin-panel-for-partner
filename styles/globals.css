@@ -1,0 +1,262 @@
+/* ==========================================================================
+   Partner Admin Panel — design tokens + global base
+   ========================================================================== */
+
+:root {
+  /* --- brand / amber ramp ------------------------------------------------ */
+  --amber-25: #fffdf8;
+  --amber-50: #fdf7ec;
+  --amber-100: #fbeed3;
+  --amber-200: #f6dfae;
+  --amber-300: #eec97c;
+  --amber-400: #e6b34c;
+  --amber-500: #dfa124;
+  --amber-600: #c98a14;
+  --amber-700: #a5700f;
+
+  --brand: var(--amber-500);
+  --brand-strong: var(--amber-600);
+  --brand-ink: #b8801a;
+  --brand-grad: linear-gradient(180deg, #e5ab31 0%, #cf9013 100%);
+  --brand-grad-hover: linear-gradient(180deg, #dfa124 0%, #bd820d 100%);
+
+  /* --- surfaces --------------------------------------------------------- */
+  --bg-app: #f2f2f3;
+  --bg-panel: #ffffff;
+  --bg-card: #ffffff;
+  --bg-subtle: #fafafa;
+  --bg-hover: #fafafa;
+  --bg-input: #ffffff;
+  --bg-amber-soft: #fdf2df;
+  --bg-amber-tint: #fdf8ef;
+
+  /* --- lines ------------------------------------------------------------ */
+  --border: #eeeef1;
+  --border-soft: #f4f4f6;
+  --border-strong: #e4e4e8;
+  --border-amber: #f2e0bd;
+
+  /* --- text ------------------------------------------------------------- */
+  --text-primary: #1b1f27;
+  --text-secondary: #5f646d;
+  --text-muted: #979ba3;
+  --text-faint: #b6b9c0;
+  --text-on-brand: #ffffff;
+
+  /* --- status ----------------------------------------------------------- */
+  --green-bg: #e9f8ef;
+  --green-text: #1a9a55;
+  --green-solid: #16a34a;
+  --blue-bg: #ecf1fe;
+  --blue-text: #3d6bd3;
+  --red-bg: #fdecec;
+  --red-text: #d9474a;
+  --amber-bg: #fdf2dd;
+  --amber-text: #b5810f;
+  --grey-bg: #f2f3f5;
+  --grey-text: #6b7078;
+
+  /* --- chart ------------------------------------------------------------ */
+  --chart-line: #e2a534;
+  --chart-fill-top: rgba(226, 165, 52, 0.22);
+  --chart-fill-bottom: rgba(226, 165, 52, 0);
+  --chart-grid: #f3f3f5;
+  --chart-axis: #a8acb3;
+
+  /* --- elevation -------------------------------------------------------- */
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.05), 0 1px 2px rgba(16, 24, 40, 0.03);
+  --shadow-md: 0 6px 18px rgba(16, 24, 40, 0.07);
+  --shadow-lg: 0 18px 44px rgba(16, 24, 40, 0.12);
+  --shadow-brand: 0 6px 14px rgba(207, 144, 19, 0.24);
+
+  /* --- geometry --------------------------------------------------------- */
+  --r-xs: 8px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-xl: 22px;
+  --r-pill: 999px;
+
+  --sidebar-w: 252px;
+  --shell-gap: 14px;
+  --shell-pad: 14px;
+  --topbar-h: 86px;
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg-app: #0c0e11;
+  --bg-panel: #14171b;
+  --bg-card: #171a1f;
+  --bg-subtle: #1b1f24;
+  --bg-hover: #1d2126;
+  --bg-input: #1b1f24;
+  --bg-amber-soft: rgba(223, 161, 36, 0.14);
+  --bg-amber-tint: rgba(223, 161, 36, 0.09);
+
+  --border: #24282e;
+  --border-soft: #1f2329;
+  --border-strong: #2e333a;
+  --border-amber: rgba(223, 161, 36, 0.3);
+
+  --text-primary: #e9ebee;
+  --text-secondary: #a4a9b1;
+  --text-muted: #7d838c;
+  --text-faint: #5d636b;
+
+  --brand-ink: #e6b34c;
+
+  --green-bg: rgba(22, 163, 74, 0.16);
+  --green-text: #48c98a;
+  --green-solid: #35bd77;
+  --blue-bg: rgba(61, 107, 211, 0.18);
+  --blue-text: #7ea3f2;
+  --red-bg: rgba(217, 71, 74, 0.16);
+  --red-text: #f08487;
+  --amber-bg: rgba(223, 161, 36, 0.18);
+  --amber-text: #e6b34c;
+  --grey-bg: #212529;
+  --grey-text: #9aa0a8;
+
+  --chart-grid: #22262b;
+  --chart-axis: #767c85;
+  --chart-fill-top: rgba(226, 165, 52, 0.26);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 18px 44px rgba(0, 0, 0, 0.6);
+
+  color-scheme: dark;
+}
+
+/* --- reset --------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font-family: "Inter", "Segoe UI Variable Text", "Segoe UI", -apple-system,
+    BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+:focus-visible {
+  outline: 2px solid var(--amber-400);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--amber-200);
+  color: #1b1f27;
+}
+
+/* --- scrollbars ---------------------------------------------------------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--r-pill);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--text-faint);
+  background-clip: content-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

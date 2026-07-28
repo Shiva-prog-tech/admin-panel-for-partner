@@ -1,0 +1,54 @@
+// ===========================================================================
+// Breakpoints + responsive mixins
+// ===========================================================================
+@use "sass:map";
+
+$bp: (
+  xs: 480px,
+  sm: 640px,
+  md: 820px,
+  lg: 1080px,
+  xl: 1280px,
+  xxl: 1560px,
+);
+
+@function bp($key) {
+  @if not map.has-key($bp, $key) {
+    @error "Unknown breakpoint `#{$key}`.";
+  }
+  @return map.get($bp, $key);
+}
+
+/// Styles applied at or below the given breakpoint.
+@mixin upto($key) {
+  @media (max-width: #{bp($key)}) {
+    @content;
+  }
+}
+
+/// Styles applied above the given breakpoint.
+@mixin from($key) {
+  @media (min-width: #{bp($key) + 1px}) {
+    @content;
+  }
+}
+
+/// Named `bp-between` so it never clashes with the flex `between` mixin.
+@mixin bp-between($lower, $upper) {
+  @media (min-width: #{bp($lower) + 1px}) and (max-width: #{bp($upper)}) {
+    @content;
+  }
+}
+
+@mixin touch {
+  @media (hover: none) and (pointer: coarse) {
+    @content;
+  }
+}
+
+/// Scopes a block to the dark theme.
+@mixin dark {
+  [data-theme="dark"] & {
+    @content;
+  }
+}

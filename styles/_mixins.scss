@@ -1,0 +1,140 @@
+// ===========================================================================
+// Reusable style mixins
+// ===========================================================================
+@use "variables" as *;
+
+@mixin flex($dir: row, $justify: flex-start, $align: center, $gap: 0) {
+  display: flex;
+  flex-direction: $dir;
+  justify-content: $justify;
+  align-items: $align;
+  @if $gap != 0 {
+    gap: $gap;
+  }
+}
+
+@mixin center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin size($w, $h: $w) {
+  width: $w;
+  height: $h;
+}
+
+@mixin truncate($lines: 1) {
+  @if $lines == 1 {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/// The floating white panel used for the sidebar and the main stage.
+@mixin panel($radius: var(--r-xl)) {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: $radius;
+}
+
+/// The inner content cards (stat tiles, chart cards, table shell).
+@mixin card($radius: var(--r-md)) {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: $radius;
+  box-shadow: var(--shadow-xs);
+}
+
+@mixin icon-btn($size: 42px, $radius: var(--r-md)) {
+  @include center;
+  @include size($size);
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: $radius;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  transition: background $fast $ease, color $fast $ease, border-color $fast $ease;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+}
+
+@mixin soft-circle($size: 44px) {
+  @include center;
+  @include size($size);
+  border-radius: var(--r-pill);
+  background: var(--bg-amber-soft);
+  color: var(--brand-strong);
+  flex: 0 0 auto;
+}
+
+@mixin label($size: $fs-xs) {
+  font-size: $size;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--text-muted);
+}
+
+@mixin field {
+  @include flex(row, flex-start, center, 9px);
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: $fs-sm;
+  transition: border-color $fast $ease, box-shadow $fast $ease;
+
+  &:focus-within {
+    border-color: var(--amber-300);
+    box-shadow: 0 0 0 3px rgba(223, 161, 36, 0.12);
+  }
+}
+
+@mixin reset-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+
+  &::placeholder {
+    color: var(--text-faint);
+  }
+}
+
+@mixin scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+@mixin fade-in($dur: $normal, $from: 4px) {
+  animation: pa-fade-in $dur $ease both;
+
+  @keyframes pa-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY($from);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}

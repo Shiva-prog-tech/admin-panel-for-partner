@@ -1,0 +1,181 @@
+// ===========================================================================
+// Buttons, pills, links
+// ===========================================================================
+@use "../mixins" as *;
+@use "../variables" as *;
+
+.btn {
+  @include flex(row, center, center, 8px);
+  height: 42px;
+  padding: 0 16px;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background $fast $ease, border-color $fast $ease, color $fast $ease,
+    box-shadow $fast $ease, transform $fast $ease;
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  // filled amber — primary table action ("Add user", "Add cardholder")
+  &--brand {
+    background: var(--brand-grad);
+    color: var(--text-on-brand);
+    box-shadow: var(--shadow-brand);
+
+    &:hover:not(:disabled) {
+      background: var(--brand-grad-hover);
+    }
+  }
+
+  // amber outline — "Export"
+  &--outline {
+    height: 44px;
+    border-color: var(--border-amber);
+    color: var(--brand-ink);
+    background: var(--bg-card);
+
+    &:hover:not(:disabled) {
+      background: var(--bg-amber-tint);
+      border-color: var(--amber-300);
+    }
+  }
+
+  // neutral outline — "Filters"
+  &--ghost {
+    border-color: var(--border);
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    font-weight: 500;
+
+    &:hover:not(:disabled) {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+  }
+
+  // borderless
+  &--plain {
+    color: var(--text-secondary);
+    background: transparent;
+    font-weight: 500;
+
+    &:hover:not(:disabled) {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+  }
+
+  &--danger {
+    background: var(--red-text);
+    color: #fff;
+
+    &:hover:not(:disabled) {
+      filter: brightness(0.94);
+    }
+  }
+
+  &--sm {
+    height: 36px;
+    padding: 0 12px;
+    font-size: 12.5px;
+  }
+
+  &--tall {
+    height: 44px;
+    border-radius: 12px;
+  }
+
+  &--block {
+    width: 100%;
+  }
+}
+
+.link-brand {
+  @include flex(row, flex-start, center, 6px);
+  color: var(--brand-ink);
+  font-size: 13px;
+  font-weight: 600;
+  transition: gap $fast $ease, color $fast $ease;
+
+  &:hover {
+    gap: 9px;
+    color: var(--brand-strong);
+  }
+}
+
+.icon-action {
+  @include center;
+  @include size(28px);
+  border-radius: var(--r-xs);
+  color: var(--text-muted);
+  transition: background $fast $ease, color $fast $ease;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+
+  &--is-open {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+}
+
+.copy-btn {
+  @include center;
+  @include size(20px);
+  border-radius: 5px;
+  color: var(--text-faint);
+  transition: background $fast $ease, color $fast $ease;
+  flex: 0 0 auto;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+  }
+
+  &--done {
+    color: var(--green-text);
+  }
+}
+
+.toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: var(--r-pill);
+  background: var(--border-strong);
+  transition: background $normal $ease;
+  flex: 0 0 auto;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    @include size(16px);
+    border-radius: var(--r-pill);
+    background: #fff;
+    box-shadow: var(--shadow-xs);
+    transition: transform $normal $ease;
+  }
+
+  &--on {
+    background: var(--brand);
+
+    &::after {
+      transform: translateX(18px);
+    }
+  }
+}

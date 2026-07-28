@@ -1,0 +1,178 @@
+// ===========================================================================
+// Hand-rolled SVG charts — sparklines, area chart, ECG pulse
+// ===========================================================================
+@use "../mixins" as *;
+@use "../variables" as *;
+@use "../media" as *;
+
+.spark {
+  display: block;
+  width: 100%;
+  overflow: visible;
+
+  &__line {
+    fill: none;
+    stroke: var(--chart-line);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  &__area {
+    stroke: none;
+  }
+}
+
+.area-chart {
+  position: relative;
+  width: 100%;
+  user-select: none;
+
+  &__svg {
+    display: block;
+    width: 100%;
+    overflow: visible;
+  }
+
+  &__grid {
+    stroke: var(--chart-grid);
+    stroke-width: 1;
+  }
+
+  &__line {
+    fill: none;
+    stroke: var(--chart-line);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  &__y-label,
+  &__x-label {
+    fill: var(--chart-axis);
+    font-size: 11px;
+    font-weight: 450;
+  }
+
+  &__y-label {
+    text-anchor: end;
+    dominant-baseline: middle;
+  }
+
+  &__x-label {
+    text-anchor: middle;
+  }
+
+  &__cursor {
+    stroke: var(--amber-400);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+  }
+
+  &__dot {
+    fill: var(--chart-line);
+    stroke: var(--bg-card);
+    stroke-width: 2.5;
+  }
+
+  &__hit {
+    fill: transparent;
+    cursor: crosshair;
+  }
+
+  &__tip {
+    position: absolute;
+    z-index: 4;
+    transform: translate(-50%, -100%);
+    padding: 7px 10px;
+    border-radius: var(--r-xs);
+    border: 1px solid var(--border);
+    background: var(--bg-panel);
+    box-shadow: var(--shadow-md);
+    pointer-events: none;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  &__tip-value {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__tip-label {
+    margin-top: 1px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+}
+
+.ecg {
+  display: block;
+  width: 100%;
+
+  &__line {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+}
+
+.bar-chart {
+  display: block;
+  width: 100%;
+  overflow: visible;
+
+  &__bar {
+    fill: var(--amber-300);
+    transition: fill $fast $ease;
+
+    &:hover {
+      fill: var(--amber-500);
+    }
+  }
+
+  &__label {
+    fill: var(--chart-axis);
+    font-size: 10.5px;
+    text-anchor: middle;
+  }
+}
+
+.donut {
+  &__track {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 10;
+  }
+
+  &__value {
+    fill: none;
+    stroke: var(--chart-line);
+    stroke-width: 10;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: center;
+  }
+}
+
+.legend {
+  @include flex(row, flex-start, center, 16px);
+  flex-wrap: wrap;
+  margin-top: 12px;
+
+  &__item {
+    @include flex(row, flex-start, center, 7px);
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  &__swatch {
+    @include size(9px);
+    border-radius: 3px;
+    flex: 0 0 auto;
+  }
+}

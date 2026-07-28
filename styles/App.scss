@@ -1,0 +1,93 @@
+// ===========================================================================
+// Partner Admin Panel — stylesheet entry point.
+// Tokens live in styles/globals.css; everything structural is composed here.
+// ===========================================================================
+
+// primitives ---------------------------------------------------------------
+@use "variables" as *;
+@use "mixins" as *;
+@use "media" as *;
+
+// components ---------------------------------------------------------------
+@use "components/shell";
+@use "components/buttons";
+@use "components/cards";
+@use "components/table";
+@use "components/forms";
+@use "components/badges";
+@use "components/charts";
+@use "components/overlays";
+
+// pages --------------------------------------------------------------------
+@use "pages/dashboard";
+@use "pages/listing";
+@use "pages/settings";
+
+// --- utilities -------------------------------------------------------------
+.u-row {
+  @include flex(row, flex-start, center, 10px);
+}
+
+.u-row-between {
+  @include between;
+}
+
+.u-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.u-gap-sm {
+  gap: 8px;
+}
+.u-gap-md {
+  gap: 14px;
+}
+.u-gap-lg {
+  gap: 20px;
+}
+
+.u-grow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.u-mt-sm {
+  margin-top: 8px;
+}
+.u-mt-md {
+  margin-top: 16px;
+}
+.u-mb-md {
+  margin-bottom: 16px;
+}
+
+.u-muted {
+  color: var(--text-muted);
+}
+
+.u-nowrap {
+  white-space: nowrap;
+}
+
+.u-tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+.u-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.u-section-gap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
