@@ -5,9 +5,17 @@ import Link from "next/link";
 import Icon from "@/Components/Icons/Icon";
 import Avatar from "@/Components/Avatar/Avatar";
 import useClickOutside from "@/customHooks/useClickOutside";
+import useSignOut from "@/customHooks/useSignOut";
 import useTheme from "@/customHooks/useTheme";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setPaletteOpen, toggleSidebar } from "@/redux/reducers/configSlice";
+import {
+  setEnvironment,
+  setPaletteOpen,
+  toggleSidebar,
+} from "@/redux/reducers/configSlice";
+import { pushToast } from "@/redux/reducers/toastSlice";
+import { ENVIRONMENTS } from "@/types/constants";
+import type { Environment } from "@/types/global";
 import { cx } from "@/utils/helper";
 
 const NOTIFICATIONS = [
@@ -29,6 +37,7 @@ export default function Topbar() {
   const tenant = useAppSelector((state) => state.config.tenant);
   const user = useAppSelector((state) => state.auth.user);
   const { theme, toggle } = useTheme();
+  const signOut = useSignOut();
 
   const [panel, setPanel] = useState<"bell" | "mail" | "profile" | null>(null);
   const rightRef = useClickOutside<HTMLDivElement>(panel !== null, () => setPanel(null));
@@ -150,6 +159,44 @@ export default function Topbar() {
           <Icon name={theme === "dark" ? "sun" : "moon"} size={19} />
         </button>
 
+        <span className="select select--tall env-select">
+          <select
+            value={tenant.mode}
+            aria-label="Environment"
+            onChange={(event) => {
+              const next = event.target.value as Environment;
+              dispatch(setEnvironment(next));
+              dispatch(
+                pushToast({
+                  tone: next === "live" ? "brand" : "info",
+                  title: `Switched to ${next === "live" ? "Live" : "Sandbox"}`,
+                  text:
+                    next === "live"
+                      ? "You are now acting on production records."
+                      : "Sandbox records are isolated from production.",
+                })
+              );
+            }}
+          >
+            {ENVIRONMENTS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <Icon name="chevronDown" size={15} className="select__caret" />
+        </span>
+
+        <button
+          type="button"
+          className="tb-btn"
+          aria-label="Sign out"
+          title="Sign out"
+          onClick={() => void signOut()}
+        >
+          <Icon name="logout" size={19} />
+        </button>
+
         <div className="popover">
           <button
             type="button"
@@ -178,7 +225,15 @@ export default function Topbar() {
                 Settings
               </Link>
               <div className="popover__divider" />
-              <button type="button" className="menu-item menu-item--danger" role="menuitem">
+              <button
+                type="button"
+                className="menu-item menu-item--danger"
+                role="menuitem"
+                onClick={() => {
+                  setPanel(null);
+                  void signOut();
+                }}
+              >
                 <Icon name="logout" size={16} />
                 Sign out
               </button>

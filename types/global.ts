@@ -33,12 +33,14 @@ export interface Column<T> {
   cellClassName?: string;
 }
 
-// --- tenant ---------------------------------------------------------------
+// --- tenant / session ------------------------------------------------------
+export type Environment = "live" | "sandbox";
+
 export interface Tenant {
   id: string;
   name: string;
   email: string;
-  mode: "live" | "sandbox";
+  mode: Environment;
   environmentLabel: string;
 }
 
@@ -47,6 +49,22 @@ export interface AdminUser {
   name: string;
   role: string;
   email: string;
+}
+
+/** Settings → Profile card */
+export interface ProfileInfo {
+  name: string;
+  email: string;
+  role: string;
+  environment: string;
+}
+
+/** Settings → Organization card */
+export interface OrganizationInfo {
+  tenant: string;
+  slug: string;
+  rateLimit: string;
+  webhookUrl: string;
 }
 
 // --- dashboard ------------------------------------------------------------
@@ -85,7 +103,7 @@ export interface FloatSummary {
   series: SeriesPoint[];
 }
 
-// --- records --------------------------------------------------------------
+// --- end users ------------------------------------------------------------
 export type EndUserStatus = "Active" | "Invited" | "Suspended" | "Closed";
 
 export interface EndUser {
@@ -100,6 +118,7 @@ export interface EndUser {
   status: EndUserStatus;
 }
 
+// --- cardholders ----------------------------------------------------------
 export type CardholderStatus = "Approved" | "Rejected" | "Pending";
 
 export interface Cardholder {
@@ -107,6 +126,7 @@ export interface Cardholder {
   refId: string;
   product: string;
   status: CardholderStatus;
+  /** issuer rejection detail; may contain several " | " separated notes */
   reason: string | null;
   cards: number;
   wallets: number;
@@ -114,78 +134,161 @@ export interface Cardholder {
   createdAt: string;
 }
 
-export type CardStatus = "Active" | "Frozen" | "Terminated" | "Pending";
+// --- cards ----------------------------------------------------------------
+export type CardStatus = "Normal" | "Pending" | "Frozen" | "Success";
 
 export interface Card {
   id: string;
   refId: string;
-  last4: string;
-  scheme: "Visa" | "Mastercard";
-  type: "Virtual" | "Physical";
-  cardholderRef: string;
-  balance: number;
-  spend30d: number;
+  /** masked PAN, e.g. "•••• •••• •••• 0300"; null before personalisation */
+  cardNumberMasked: string | null;
+  /** issuer card reference (long WD… number) */
+  cardNo: string;
+  last4: string | null;
+  balance: number | null;
+  currency: string;
+  product: string;
   status: CardStatus;
   createdAt: string;
 }
 
-export type TxStatus = "Settled" | "Pending" | "Declined" | "Reversed";
+// --- card transactions ----------------------------------------------------
+export type TxType = "auth" | "purchase" | "refund";
+export type TxStatus = "Authorized" | "Success" | "Pending" | "Failed";
 
 export interface Transaction {
   id: string;
   refId: string;
   merchant: string;
-  mcc: string;
-  cardLast4: string;
   amount: number;
   currency: string;
+  type: TxType;
   status: TxStatus;
+  last4: string | null;
   createdAt: string;
 }
 
-export type CardOrderStatus =
-  | "Delivered"
-  | "Shipped"
-  | "In production"
-  | "Requested"
-  | "Cancelled";
+// --- physical card orders -------------------------------------------------
+export type CardOrderStatus = "Pending" | "Shipped" | "Delivered";
 
 export interface CardOrder {
   id: string;
+  /** human order number */
+  order: string;
   refId: string;
-  cardholderRef: string;
-  product: string;
-  quantity: number;
-  destination: string;
   status: CardOrderStatus;
+  recipient: string;
+  country: string;
+  tracking: string | null;
   createdAt: string;
 }
 
+// --- float ledger ---------------------------------------------------------
 export type LedgerDirection = "credit" | "debit";
 
-export interface FloatEntry {
+export type JournalReason =
+  | "prefund"
+  | "crypto_settlement"
+  | "card_topup"
+  | "card_topup_refund"
+  | "card_issuance";
+
+export interface JournalEntry {
   id: string;
-  refId: string;
-  description: string;
-  direction: LedgerDirection;
-  amount: number;
-  balanceAfter: number;
   createdAt: string;
+  direction: LedgerDirection;
+  /** always USD on the float ledger */
+  amount: number;
+  reason: JournalReason;
+  reference: string | null;
 }
 
-export type CryptoTxStatus = "Confirmed" | "Pending" | "Failed";
+export interface ConvertQuote {
+  asset: string;
+  chain: string;
+  amount: number;
+  rate: number;
+  usd: number;
+  feeUsd: number;
+  netUsd: number;
+}
+
+// --- custody --------------------------------------------------------------
+export interface CustodyAssetTile {
+  id: string;
+  asset: string;
+  balance: string;
+  clients: number;
+}
+
+export interface PoolBalance {
+  id: string;
+  asset: string;
+  chain: string;
+  balance: string;
+  updatedAt: string;
+}
+
+export type WithdrawalStatus =
+  | "Pending"
+  | "Processing"
+  | "Approved"
+  | "Completed"
+  | "Failed";
+
+export interface CustodyWithdrawal {
+  id: string;
+  createdAt: string;
+  refId: string;
+  asset: string;
+  amount: string;
+  status: WithdrawalStatus;
+  reason: string | null;
+  /** destination address */
+  to: string;
+}
+
+export interface FeeSchedule {
+  deposit: string;
+  withdrawal: string;
+  monthly: string;
+  approvalRequired: string;
+}
+
+// --- crypto transactions --------------------------------------------------
+export type CryptoReason = "deposit" | "withdrawal" | "settlement" | "refund";
 
 export interface CryptoTx {
   id: string;
-  hash: string;
-  asset: string;
-  network: string;
-  direction: "in" | "out";
-  amount: string;
-  usdValue: number;
-  confirmations: number;
-  status: CryptoTxStatus;
   createdAt: string;
+  /** end-user ref, or "_pool" for tenant pool movements */
+  refId: string;
+  dir: LedgerDirection;
+  asset: string;
+  chain: string;
+  /** raw units as reported by custody, e.g. "47.19999973" */
+  amount: string;
+  reason: CryptoReason;
+  txHash: string | null;
+}
+
+// --- webhooks -------------------------------------------------------------
+export type DeliveryStatus = "Delivered" | "Failed" | "Pending";
+
+export interface WebhookConfig {
+  url: string;
+  secretHint: string;
+  rotatedAt: string;
+}
+
+export interface WebhookDelivery {
+  id: string;
+  createdAt: string;
+  event: string;
+  refId: string;
+  status: DeliveryStatus;
+  attempts: number;
+  error: string | null;
 }
 
 export type WebhookState = "Healthy" | "Degraded" | "Failing" | "Paused";
@@ -200,17 +303,33 @@ export interface WebhookEndpoint {
   createdAt: string;
 }
 
+// --- api keys -------------------------------------------------------------
 export type ApiKeyState = "Active" | "Revoked";
 
 export interface ApiKey {
   id: string;
-  label: string;
+  /** visible key prefix, e.g. "fsk_live_4f054af" */
   prefix: string;
-  scope: "read" | "read_write";
-  environment: "live" | "sandbox";
-  lastUsed: string | null;
+  label: string;
   state: ApiKeyState;
+  lastUsed: string | null;
+  scope: "read" | "read_write";
+  environment: Environment;
   createdAt: string;
+}
+
+// --- audit ----------------------------------------------------------------
+export type HttpMethod = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
+
+/** One machine API request against the partner API. */
+export interface ApiRequestLog {
+  id: string;
+  createdAt: string;
+  method: HttpMethod;
+  path: string;
+  status: number;
+  refId: string;
+  latencyMs: number;
 }
 
 export interface AuditEvent {
@@ -248,4 +367,9 @@ export interface Paginated<T> {
   total: number;
   page: number;
   pageSize: number;
+}
+
+export interface SelectOption {
+  value: string;
+  label: string;
 }

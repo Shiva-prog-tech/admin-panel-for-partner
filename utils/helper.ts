@@ -203,6 +203,8 @@ export function shiftIsoDate(iso: string, deltaDays: number): string {
 // --- strings --------------------------------------------------------------
 export function truncateMiddle(value: string, head = 10, tail = 8): string {
   if (value.length <= head + tail + 1) return value;
+  // `slice(-0)` returns the whole string, so a zero tail must short-circuit.
+  if (tail <= 0) return `${value.slice(0, head)}…`;
   return `${value.slice(0, head)}…${value.slice(-tail)}`;
 }
 

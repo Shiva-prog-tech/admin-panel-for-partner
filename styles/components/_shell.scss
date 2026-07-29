@@ -368,6 +368,27 @@
   }
 }
 
+// environment switcher in the top bar
+.env-select {
+  select {
+    height: 44px;
+    border-radius: 12px;
+    padding-right: 34px;
+    font-weight: 600;
+    color: var(--brand-ink);
+    border-color: var(--border-amber);
+    background: var(--bg-amber-tint);
+  }
+
+  .select__caret {
+    color: var(--brand-strong);
+  }
+
+  @include upto(sm) {
+    display: none;
+  }
+}
+
 .profile-chip {
   @include flex(row, flex-start, center, 7px);
   height: 46px;

@@ -8,22 +8,29 @@ import { cardholders } from "@/utils/mockData/cardholders";
 import { cards } from "@/utils/mockData/cards";
 import { transactions } from "@/utils/mockData/transactions";
 import { cardOrders } from "@/utils/mockData/cardOrders";
-import { floatEntries } from "@/utils/mockData/floatLedger";
+import { journalEntries } from "@/utils/mockData/floatLedger";
 import { cryptoTxs } from "@/utils/mockData/cryptoTxs";
 import { webhookEndpoints } from "@/utils/mockData/webhooks";
+import { webhookDeliveries } from "@/utils/mockData/webhookDeliveries";
 import { apiKeys } from "@/utils/mockData/apiKeys";
 import { auditEvents } from "@/utils/mockData/auditLog";
+import { apiRequests } from "@/utils/mockData/apiAuditLog";
+import { custodyWithdrawals, poolBalances } from "@/utils/mockData/custody";
 import type {
   ApiKey,
+  ApiRequestLog,
   AuditEvent,
   Card,
   CardOrder,
   Cardholder,
   CryptoTx,
+  CustodyWithdrawal,
   EndUser,
-  FloatEntry,
+  JournalEntry,
   Paginated,
+  PoolBalance,
   Transaction,
+  WebhookDelivery,
   WebhookEndpoint,
 } from "@/types/global";
 
@@ -63,10 +70,19 @@ export const recordsService = {
   cards: (q: ListQuery = {}) => list<Card>("/cards", cards, q),
   transactions: (q: ListQuery = {}) => list<Transaction>("/transactions", transactions, q),
   cardOrders: (q: ListQuery = {}) => list<CardOrder>("/card-orders", cardOrders, q),
-  floatEntries: (q: ListQuery = {}) => list<FloatEntry>("/float/ledger", floatEntries, q),
+  journalEntries: (q: ListQuery = {}) =>
+    list<JournalEntry>("/float/journal", journalEntries, q),
   cryptoTxs: (q: ListQuery = {}) => list<CryptoTx>("/crypto-txs", cryptoTxs, q),
+  poolBalances: (q: ListQuery = {}) =>
+    list<PoolBalance>("/custody/pool-balances", poolBalances, q),
+  custodyWithdrawals: (q: ListQuery = {}) =>
+    list<CustodyWithdrawal>("/custody/withdrawals", custodyWithdrawals, q),
   webhooks: (q: ListQuery = {}) => list<WebhookEndpoint>("/webhooks", webhookEndpoints, q),
+  webhookDeliveries: (q: ListQuery = {}) =>
+    list<WebhookDelivery>("/webhooks/deliveries", webhookDeliveries, q),
   apiKeys: (q: ListQuery = {}) => list<ApiKey>("/api-keys", apiKeys, q),
+  apiRequests: (q: ListQuery = {}) =>
+    list<ApiRequestLog>("/audit-log/api-requests", apiRequests, q),
   auditLog: (q: ListQuery = {}) => list<AuditEvent>("/audit-log", auditEvents, q),
 
   /** CSV export — the API streams a file; mock mode builds it in the browser. */

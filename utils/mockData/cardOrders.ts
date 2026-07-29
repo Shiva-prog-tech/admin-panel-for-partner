@@ -1,50 +1,60 @@
 // ===========================================================================
-// Card orders dataset
+// Physical card orders dataset
 // ===========================================================================
 import type { CardOrder, CardOrderStatus } from "@/types/global";
 import { smoothSeries } from "@/utils/helper";
 import { COUNTRIES } from "@/utils/CountryData";
 import { cardholders } from "./cardholders";
-import { descendingStamps, hashSeed, pick, refIds, seededRandom, weighted } from "./seed";
+import { descendingStamps, hashSeed, pick, seededRandom, weighted } from "./seed";
 
-const TOTAL = 42;
+const TOTAL = 14;
 
-const PRODUCTS = [
-  "prod_TM1031",
-  "prod_TM1042",
-  "prod_TM1049",
-  "prod_TM1060",
-  "prod_TM110A",
+const STATUSES: CardOrderStatus[] = ["Pending", "Shipped", "Delivered"];
+const STATUS_WEIGHTS = [22, 26, 52];
+
+const RECIPIENTS = [
+  "Aarav Menon",
+  "Layla Haddad",
+  "Tomás Ferreira",
+  "Chen Wei",
+  "Priya Nair",
+  "Omar Al Farsi",
+  "Sofia Rossi",
+  "Daniel Okoye",
+  "Hana Suzuki",
+  "Marcus Lindqvist",
+  "Fatima Zahra",
+  "Elena Petrova",
+  "Kwame Mensah",
+  "Isabella Duarte",
 ] as const;
 
-const STATUSES: CardOrderStatus[] = [
-  "Delivered",
-  "Shipped",
-  "In production",
-  "Requested",
-  "Cancelled",
-];
-const STATUS_WEIGHTS = [44, 20, 16, 14, 6];
+/** Courier references only exist once the order leaves production. */
+function tracking(rand: () => number): string {
+  let digits = "";
+  for (let i = 0; i < 10; i += 1) digits += Math.floor(rand() * 10);
+  return `SWP${digits}AE`;
+}
 
 function build(): CardOrder[] {
-  const rand = seededRandom(hashSeed("card-orders"));
-  const ids = refIds("order-refs", TOTAL, 20);
-  const stamps = descendingStamps("order-stamps", "2026-07-28T18:12:40", TOTAL, {
+  const rand = seededRandom(hashSeed("card-orders-v2"));
+  const stamps = descendingStamps("order-stamps-v2", "2026-07-28T18:12:40", TOTAL, {
     minGap: 240,
     maxGap: 3200,
   });
 
   return Array.from({ length: TOTAL }, (_, i) => {
     const country = pick(COUNTRIES, rand);
+    const status = weighted(STATUSES, STATUS_WEIGHTS, rand);
 
     return {
       id: `co-${i + 1}`,
-      refId: ids[i],
-      cardholderRef: cardholders[Math.floor(rand() * cardholders.length)].refId,
-      product: pick(PRODUCTS, rand),
-      quantity: weighted([1, 1, 2, 5], [70, 14, 11, 5], rand),
-      destination: `${country.name} (${country.code})`,
-      status: weighted(STATUSES, STATUS_WEIGHTS, rand),
+      order: `ORD-${String(2041 - i).padStart(4, "0")}`,
+      refId: cardholders[Math.floor(rand() * cardholders.length)].refId,
+      status,
+      recipient: RECIPIENTS[i % RECIPIENTS.length],
+      country: `${country.name} (${country.code})`,
+      tracking: status === "Pending" ? null : tracking(rand),
       createdAt: stamps[i],
     } satisfies CardOrder;
   });
@@ -55,14 +65,12 @@ export const cardOrders: CardOrder[] = build();
 export const cardOrderStats = {
   total: cardOrders.length,
   delivered: cardOrders.filter((o) => o.status === "Delivered").length,
-  inTransit: cardOrders.filter((o) => o.status === "Shipped").length,
-  pending: cardOrders.filter(
-    (o) => o.status === "Requested" || o.status === "In production"
-  ).length,
+  shipped: cardOrders.filter((o) => o.status === "Shipped").length,
+  pending: cardOrders.filter((o) => o.status === "Pending").length,
   series: {
     total: smoothSeries("co-total", 26),
     delivered: smoothSeries("co-delivered", 26),
-    transit: smoothSeries("co-transit", 26),
+    shipped: smoothSeries("co-transit", 26),
     pending: smoothSeries("co-pending", 26),
   },
 };

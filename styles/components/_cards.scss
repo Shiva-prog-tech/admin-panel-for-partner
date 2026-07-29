@@ -61,6 +61,19 @@
     line-height: 1.12;
     color: var(--text-primary);
     font-variant-numeric: tabular-nums;
+
+    // long composite headlines (e.g. "35.81 USDT · 2.58 TRX · …") need to wrap
+    &--sm {
+      font-size: 20px;
+      letter-spacing: -0.015em;
+      line-height: 1.25;
+    }
+
+    &--xs {
+      font-size: 16px;
+      letter-spacing: -0.005em;
+      line-height: 1.35;
+    }
   }
 
   &__caption {

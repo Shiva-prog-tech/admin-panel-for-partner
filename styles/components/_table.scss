@@ -159,6 +159,14 @@
   }
 }
 
+// long issuer card references stay on one line but shrink slightly
+.card-no {
+  font-size: 11.5px;
+  letter-spacing: -0.02em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 .table-footer {
   @include flex(row, space-between, center, 14px);
   flex-wrap: wrap;

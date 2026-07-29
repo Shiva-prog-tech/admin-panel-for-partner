@@ -1,46 +1,56 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import PageHeader from "@/Components/PageHeader/PageHeader";
 import DateRangePicker from "@/Components/DateRangePicker/DateRangePicker";
 import StatCard from "@/Components/StatCard/StatCard";
 import TableCard from "@/Components/Table/TableCard";
+import SelectFilter from "@/Components/Table/SelectFilter";
 import RefCell from "@/Components/Table/RefCell";
 import RowMenu from "@/Components/Table/RowMenu";
-import FilterMenu from "@/Components/Table/FilterMenu";
 import ExportButton from "@/Components/Table/ExportButton";
 import Badge from "@/Components/Badge/Badge";
 import useTableState from "@/customHooks/useTableState";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { clearFilters, selectStatuses, toggleStatus } from "@/redux/reducers/filtersSlice";
+import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/toastSlice";
-import type { Column, Transaction } from "@/types/global";
 import {
-  transactions as seededTransactions,
-  transactionStats,
-} from "@/utils/mockData/transactions";
+  TX_STATUS_BUCKETS,
+  TX_STATUS_OPTIONS,
+  TX_TYPE_OPTIONS,
+} from "@/types/constants";
+import type { Column, Transaction } from "@/types/global";
+import { transactions, transactionStats } from "@/utils/mockData/transactions";
 import { formatDateTimeNumeric, formatMoney, formatNumber, formatPercent } from "@/utils/helper";
-
-const RESOURCE = "transactions";
-const STATUSES = ["Settled", "Pending", "Declined", "Reversed"] as const;
 
 export default function Transactions() {
   const dispatch = useAppDispatch();
-  const selected = useAppSelector(selectStatuses(RESOURCE));
+  const [type, setType] = useState("");
+  const [status, setStatus] = useState("");
 
   const filter = useMemo(() => {
-    if (!selected.length) return undefined;
-    return (row: Transaction) => selected.includes(row.status);
-  }, [selected]);
+    if (!type && !status) return undefined;
+    // "Success" also covers rows the issuer reports as "Authorized".
+    const allowed = status ? TX_STATUS_BUCKETS[status] ?? [status] : null;
+    return (row: Transaction) =>
+      (!type || row.type === type) && (!allowed || allowed.includes(row.status));
+  }, [type, status]);
 
   const state = useTableState<Transaction>({
-    rows: seededTransactions,
+    rows: transactions,
     filter,
-    searchFields: (row) => [row.refId, row.merchant, row.cardLast4, row.status],
-    sortValue: (row, key) => (row as unknown as Record<string, string | number>)[key] ?? null,
+    searchFields: (row) => [row.refId, row.merchant, row.last4, row.status],
+    sortValue: (row, key) =>
+      (row as unknown as Record<string, string | number | null>)[key] ?? null,
   });
 
   const columns: Column<Transaction>[] = [
+    {
+      key: "createdAt",
+      header: "Date",
+      sortable: true,
+      cellClassName: "dt__nowrap",
+      render: (row) => formatDateTimeNumeric(row.createdAt),
+    },
     {
       key: "refId",
       header: "Ref ID",
@@ -53,32 +63,34 @@ export default function Transactions() {
       sortable: true,
       render: (row) => <span className="dt__strong">{row.merchant}</span>,
     },
-    { key: "mcc", header: "MCC", align: "center", render: (row) => <span className="dt__mono">{row.mcc}</span> },
-    {
-      key: "cardLast4",
-      header: "Card",
-      align: "center",
-      render: (row) => <span className="dt__mono">•••• {row.cardLast4}</span>,
-    },
     {
       key: "amount",
       header: "Amount",
       align: "right",
       sortable: true,
-      render: (row) => <span className="dt__strong">{formatMoney(row.amount)}</span>,
+      render: (row) => (
+        <span className="dt__strong">
+          {formatMoney(row.amount, "")} {row.currency}
+        </span>
+      ),
     },
     {
-      key: "status",
-      header: "Status",
+      key: "type",
+      header: "Type",
       sortable: true,
-      render: (row) => <Badge>{row.status}</Badge>,
+      render: (row) => <span className="dt__mono">{row.type}</span>,
     },
+    { key: "status", header: "Status", sortable: true, render: (row) => <Badge>{row.status}</Badge> },
     {
-      key: "createdAt",
-      header: "Created",
-      sortable: true,
-      cellClassName: "dt__nowrap",
-      render: (row) => formatDateTimeNumeric(row.createdAt),
+      key: "last4",
+      header: "Last 4",
+      align: "center",
+      render: (row) =>
+        row.last4 ? (
+          <span className="dt__mono">{row.last4}</span>
+        ) : (
+          <span className="dt__muted">—</span>
+        ),
     },
     {
       key: "action",
@@ -111,7 +123,7 @@ export default function Transactions() {
                     pushToast({
                       tone: "info",
                       title: "Dispute started",
-                      text: `${row.merchant} · ${formatMoney(row.amount)}`,
+                      text: `${row.merchant} · ${formatMoney(row.amount, "")} ${row.currency}`,
                     })
                   ),
               },
@@ -125,8 +137,9 @@ export default function Transactions() {
   return (
     <div className="listing">
       <PageHeader
-        title="Transactions"
+        title="Card transactions"
         crumbs={[{ label: "Dashboard", href: "/" }, { label: "Transactions" }]}
+        subtitle="Spend and authorizations across all end users"
         actions={
           <>
             <DateRangePicker />
@@ -134,14 +147,14 @@ export default function Transactions() {
               filename="card-transactions.csv"
               rows={state.pageRows}
               columns={[
+                { label: "Date", value: (r) => r.createdAt },
                 { label: "Ref ID", value: (r) => r.refId },
                 { label: "Merchant", value: (r) => r.merchant },
-                { label: "MCC", value: (r) => r.mcc },
-                { label: "Card", value: (r) => r.cardLast4 },
                 { label: "Amount", value: (r) => r.amount },
                 { label: "Currency", value: (r) => r.currency },
+                { label: "Type", value: (r) => r.type },
                 { label: "Status", value: (r) => r.status },
-                { label: "Created", value: (r) => r.createdAt },
+                { label: "Last 4", value: (r) => r.last4 },
               ]}
             />
           </>
@@ -150,8 +163,8 @@ export default function Transactions() {
 
       <div className="stat-grid listing__stats">
         <StatCard variant="inline" icon="transactions" label="Transactions" value={formatNumber(transactionStats.total)} caption="This period" series={transactionStats.series.total} />
-        <StatCard variant="inline" icon="wallet" label="Settled volume" value={formatMoney(transactionStats.settledVolume)} caption="This period" series={transactionStats.series.volume} />
-        <StatCard variant="inline" icon="ban" label="Declined" value={formatNumber(transactionStats.declined)} caption="This period" series={transactionStats.series.declined} />
+        <StatCard variant="inline" icon="wallet" label="Approved volume" value={`${formatMoney(transactionStats.approvedVolume, "")} AED`} caption="This period" series={transactionStats.series.volume} />
+        <StatCard variant="inline" icon="ban" label="Failed" value={formatNumber(transactionStats.failed)} caption="This period" series={transactionStats.series.failed} />
         <StatCard variant="inline" icon="checkCircle" label="Approval rate" value={formatPercent(transactionStats.approvalRate)} caption="This period" series={transactionStats.series.approval} />
       </div>
 
@@ -159,17 +172,24 @@ export default function Transactions() {
         state={state}
         columns={columns}
         rowKey={(row) => row.id}
-        minWidth={1140}
-        searchPlaceholder="Search ref ID or merchant..."
+        minWidth={1320}
+        searchPlaceholder="Search merchant, ref ID, card..."
         unit="transactions"
         toolbarRight={
-          <FilterMenu
-            options={STATUSES}
-            selected={selected}
-            showCaret
-            onToggle={(status) => dispatch(toggleStatus({ resource: RESOURCE, status }))}
-            onClear={() => dispatch(clearFilters(RESOURCE))}
-          />
+          <>
+            <SelectFilter
+              label="Transaction type"
+              value={type}
+              onChange={setType}
+              options={TX_TYPE_OPTIONS}
+            />
+            <SelectFilter
+              label="Transaction status"
+              value={status}
+              onChange={setStatus}
+              options={TX_STATUS_OPTIONS}
+            />
+          </>
         }
       />
     </div>

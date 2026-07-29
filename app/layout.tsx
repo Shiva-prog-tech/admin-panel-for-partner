@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
 import "@/styles/App.scss";
 import ReduxProvider from "@/redux/provider";
-import AppShell from "@/Components/AppShell/AppShell";
+import SessionBootstrap from "@/Components/AuthGate/SessionBootstrap";
 import { APP_NAME, APP_TAGLINE } from "@/types/constants";
 
 export const metadata: Metadata = {
@@ -52,7 +52,8 @@ export default function RootLayout({
       </head>
       <body>
         <ReduxProvider>
-          <AppShell>{children}</AppShell>
+          <SessionBootstrap />
+          {children}
         </ReduxProvider>
       </body>
     </html>

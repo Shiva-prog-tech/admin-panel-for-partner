@@ -1,16 +1,16 @@
-// ===========================================================================
-// Cardholders dataset — 84 records (64 approved / 12 rejected / 8 pending)
+﻿// ===========================================================================
+// Cardholders dataset â€” 84 records (64 approved / 12 rejected / 8 pending)
 // ===========================================================================
 import type { Cardholder, CardholderStatus } from "@/types/global";
 import { smoothSeries } from "@/utils/helper";
-import { REJECTION_REASONS } from "@/types/constants";
+import { CARD_PRODUCTS, REJECTION_REASONS } from "@/types/constants";
 import { descendingStamps, hashSeed, pick, refIds, seededRandom, weighted } from "./seed";
 
 const FIRST_PAGE: Cardholder[] = [
   {
     id: "ch-1",
     refId: "6a68d00a11e300cb9f57e1e3",
-    product: "prod_TM110A",
+    product: "prod_111059",
     status: "Approved",
     reason: null,
     cards: 2,
@@ -21,9 +21,10 @@ const FIRST_PAGE: Cardholder[] = [
   {
     id: "ch-2",
     refId: "6a6958d11c39bc0d457c148",
-    product: "prod_TM102B",
+    product: "prod_111059",
     status: "Rejected",
-    reason: "An issue was detected with the document and verification",
+    reason:
+      "An issue was detected with the document and verification could not be completed",
     cards: 0,
     wallets: 0,
     deposited: null,
@@ -32,7 +33,7 @@ const FIRST_PAGE: Cardholder[] = [
   {
     id: "ch-3",
     refId: "6a687d9011e300cb9f57e10d",
-    product: "prod_TM1031",
+    product: "prod_111031",
     status: "Approved",
     reason: null,
     cards: 1,
@@ -43,7 +44,7 @@ const FIRST_PAGE: Cardholder[] = [
   {
     id: "ch-4",
     refId: "6a67881f004780d52296f2af",
-    product: "prod_TM1049",
+    product: "prod_111059",
     status: "Approved",
     reason: null,
     cards: 1,
@@ -54,7 +55,7 @@ const FIRST_PAGE: Cardholder[] = [
   {
     id: "ch-5",
     refId: "6a67dd211e300cb9f57e043",
-    product: "prod_TM1059",
+    product: "prod_111059",
     status: "Approved",
     reason: null,
     cards: 0,
@@ -65,7 +66,7 @@ const FIRST_PAGE: Cardholder[] = [
   {
     id: "ch-6",
     refId: "6a679fecd04790d52296f2c1",
-    product: "prod_TM1050",
+    product: "prod_111059",
     status: "Approved",
     reason: null,
     cards: 1,
@@ -76,9 +77,10 @@ const FIRST_PAGE: Cardholder[] = [
   {
     id: "ch-7",
     refId: "6a679817d04790d52296f2af",
-    product: "prod_TM1031",
+    product: "prod_111031",
     status: "Rejected",
-    reason: "The applicant uploaded screenshots instead of photos",
+    reason:
+      "The applicant uploaded screenshots instead of photos or scans.  |  [PASSPORT] The applicant uploaded screenshots instead of photos",
     cards: 0,
     wallets: 1,
     deposited: null,
@@ -87,7 +89,7 @@ const FIRST_PAGE: Cardholder[] = [
   {
     id: "ch-8",
     refId: "6a6785d8f04790d52296f283",
-    product: "prod_TM1042",
+    product: "prod_111059",
     status: "Approved",
     reason: null,
     cards: 0,
@@ -98,9 +100,9 @@ const FIRST_PAGE: Cardholder[] = [
   {
     id: "ch-9",
     refId: "6a676f85d04790d52296f23c",
-    product: "prod_TM1042",
+    product: "prod_111059",
     status: "Rejected",
-    reason: "The type of residence permit is not supported",
+    reason: "The type of residence permit is not supported.",
     cards: 0,
     wallets: 2,
     deposited: null,
@@ -109,7 +111,7 @@ const FIRST_PAGE: Cardholder[] = [
   {
     id: "ch-10",
     refId: "6a67336d04790d52296f1d2",
-    product: "prod_TM1060",
+    product: "prod_111059",
     status: "Approved",
     reason: null,
     cards: 0,
@@ -122,18 +124,8 @@ const FIRST_PAGE: Cardholder[] = [
 const TOTAL = 84;
 const GENERATED = TOTAL - FIRST_PAGE.length;
 
-const PRODUCTS = [
-  "prod_TM1031",
-  "prod_TM1042",
-  "prod_TM1049",
-  "prod_TM1050",
-  "prod_TM1059",
-  "prod_TM1060",
-  "prod_TM102B",
-  "prod_TM110A",
-  "prod_TM1074",
-  "prod_TM1088",
-] as const;
+// The portal issues against two card products.
+const PRODUCTS = CARD_PRODUCTS;
 
 // Remaining rows must land the page totals on 64 / 12 / 8.
 const REMAINING: CardholderStatus[] = [
@@ -193,3 +185,4 @@ export const cardholderStats = {
 };
 
 export default cardholders;
+

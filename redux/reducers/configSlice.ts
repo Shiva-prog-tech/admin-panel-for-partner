@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { Tenant, Theme } from "@/types/global";
+import type { Environment, Tenant, Theme } from "@/types/global";
 import { DEFAULT_RANGE_ID } from "@/types/constants";
 import { DEFAULT_TENANT } from "@/utils/Config";
 
@@ -26,6 +26,11 @@ const configSlice = createSlice({
     setTenant(state, action: PayloadAction<Tenant>) {
       state.tenant = action.payload;
     },
+    setEnvironment(state, action: PayloadAction<Environment>) {
+      state.tenant.mode = action.payload;
+      state.tenant.environmentLabel =
+        action.payload === "live" ? "live environment" : "sandbox environment";
+    },
     setTheme(state, action: PayloadAction<Theme>) {
       state.theme = action.payload;
     },
@@ -46,6 +51,7 @@ const configSlice = createSlice({
 
 export const {
   setTenant,
+  setEnvironment,
   setTheme,
   setRange,
   setSidebarOpen,

@@ -47,6 +47,7 @@ export type IconName =
   | "close"
   | "external"
   | "eye"
+  | "eyeOff"
   | "trash"
   | "refresh"
   | "info"
@@ -299,6 +300,14 @@ const PATHS: Record<IconName, ReactNode> = {
     <>
       <path d="M2.2 12S5.8 5.2 12 5.2 21.8 12 21.8 12 18.2 18.8 12 18.8 2.2 12 2.2 12Z" />
       <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  eyeOff: (
+    <>
+      <path d="M10.7 5.1A10.4 10.4 0 0 1 12 5c6.2 0 9.8 7 9.8 7a13.2 13.2 0 0 1-1.7 2.7" />
+      <path d="M6.6 6.6A13.5 13.5 0 0 0 2.2 12S5.8 19 12 19a9.7 9.7 0 0 0 5.4-1.6" />
+      <path d="M14.1 14.2a3 3 0 0 1-4.3-4.3" />
+      <path d="M2.5 2.5l19 19" />
     </>
   ),
   trash: (

@@ -1,53 +1,68 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import PageHeader from "@/Components/PageHeader/PageHeader";
 import DateRangePicker from "@/Components/DateRangePicker/DateRangePicker";
 import StatCard from "@/Components/StatCard/StatCard";
 import TableCard from "@/Components/Table/TableCard";
-import RefCell from "@/Components/Table/RefCell";
+import SelectFilter from "@/Components/Table/SelectFilter";
 import ExportButton from "@/Components/Table/ExportButton";
 import AreaChart from "@/Components/Charts/AreaChart";
 import Badge from "@/Components/Badge/Badge";
-import Icon from "@/Components/Icons/Icon";
+import ConvertCard from "./ConvertCard";
 import useTableState from "@/customHooks/useTableState";
-import { useAppDispatch } from "@/redux/hooks";
-import { pushToast } from "@/redux/reducers/toastSlice";
-import type { Column, FloatEntry } from "@/types/global";
+import { useAppSelector } from "@/redux/hooks";
+import {
+  DIRECTION_OPTIONS,
+  JOURNAL_REASON_OPTIONS,
+} from "@/types/constants";
+import type { Column, JournalEntry } from "@/types/global";
 import { floatSummary } from "@/utils/mockData/dashboard";
-import { floatEntries, floatStats } from "@/utils/mockData/floatLedger";
+import { journalEntries, floatStats } from "@/utils/mockData/floatLedger";
+import { custodySummaryLine } from "@/utils/mockData/custody";
 import {
   formatDateTimeNumeric,
   formatMoney,
   formatMoneyPlain,
-  formatNumber,
   smoothSeries,
 } from "@/utils/helper";
 
 export default function Float() {
-  const dispatch = useAppDispatch();
+  const tenant = useAppSelector((state) => state.config.tenant);
 
-  const state = useTableState<FloatEntry>({
-    rows: floatEntries,
-    searchFields: (row) => [row.refId, row.description, row.direction],
-    sortValue: (row, key) => (row as unknown as Record<string, string | number>)[key] ?? null,
+  const [direction, setDirection] = useState("");
+  const [reason, setReason] = useState("");
+
+  const filter = useMemo(() => {
+    if (!direction && !reason) return undefined;
+    return (row: JournalEntry) =>
+      (!direction || row.direction === direction) &&
+      (!reason || row.reason === reason);
+  }, [direction, reason]);
+
+  const state = useTableState<JournalEntry>({
+    rows: journalEntries,
+    filter,
+    searchFields: (row) => [row.reference, row.reason, row.direction],
+    sortValue: (row, key) =>
+      (row as unknown as Record<string, string | number>)[key] ?? null,
   });
 
-  const columns: Column<FloatEntry>[] = [
-    { key: "refId", header: "Entry", sortable: true, render: (row) => <RefCell value={row.refId} /> },
+  const columns: Column<JournalEntry>[] = [
     {
-      key: "description",
-      header: "Description",
+      key: "createdAt",
+      header: "Date",
       sortable: true,
-      render: (row) => <span className="dt__strong">{row.description}</span>,
+      cellClassName: "dt__nowrap",
+      render: (row) => formatDateTimeNumeric(row.createdAt),
     },
     {
       key: "direction",
       header: "Direction",
-      align: "center",
       sortable: true,
       render: (row) => (
         <Badge tone={row.direction === "credit" ? "success" : "neutral"}>
-          {row.direction === "credit" ? "Credit" : "Debit"}
+          {row.direction}
         </Badge>
       ),
     },
@@ -61,92 +76,128 @@ export default function Float() {
           className="dt__strong"
           style={{ color: row.direction === "credit" ? "var(--green-text)" : undefined }}
         >
-          {row.direction === "credit" ? "+" : "−"}
-          {formatMoney(row.amount)}
+          {row.amount.toFixed(2)} USD
         </span>
       ),
     },
     {
-      key: "balanceAfter",
-      header: "Balance after",
-      align: "right",
+      key: "reason",
+      header: "Reason",
       sortable: true,
-      render: (row) => formatMoney(row.balanceAfter),
+      render: (row) => <span className="dt__mono">{row.reason}</span>,
     },
     {
-      key: "createdAt",
-      header: "Created",
-      sortable: true,
-      cellClassName: "dt__nowrap",
-      render: (row) => formatDateTimeNumeric(row.createdAt),
+      key: "reference",
+      header: "Reference",
+      render: (row) =>
+        row.reference ? (
+          <span
+            className={row.reason === "card_topup_refund" ? "dt__reason" : undefined}
+            style={
+              row.reason === "card_topup_refund" ? undefined : { color: "var(--text-secondary)" }
+            }
+          >
+            {row.reference}
+          </span>
+        ) : (
+          <span className="dt__muted">—</span>
+        ),
     },
   ];
 
   return (
     <div className="listing">
       <PageHeader
-        title="Float"
+        title="Float ledger"
         crumbs={[{ label: "Dashboard", href: "/" }, { label: "Float" }]}
+        subtitle="Prefunded USD balance used for card issuance and top-ups"
         actions={
           <>
             <DateRangePicker />
             <ExportButton
-              filename="float-ledger.csv"
+              filename="float-journal.csv"
               rows={state.pageRows}
               columns={[
-                { label: "Entry", value: (r) => r.refId },
-                { label: "Description", value: (r) => r.description },
+                { label: "Date", value: (r) => r.createdAt },
                 { label: "Direction", value: (r) => r.direction },
                 { label: "Amount", value: (r) => r.amount },
-                { label: "Balance after", value: (r) => r.balanceAfter },
-                { label: "Created", value: (r) => r.createdAt },
+                { label: "Currency", value: () => "USD" },
+                { label: "Reason", value: (r) => r.reason },
+                { label: "Reference", value: (r) => r.reference },
               ]}
             />
           </>
         }
       />
 
-      <div className="stat-grid listing__stats">
-        <StatCard variant="inline" icon="wallet" label="USD float" value={formatMoneyPlain(floatStats.balance)} caption="Available now" series={smoothSeries("float-balance", 26)} />
-        <StatCard variant="inline" icon="arrowUp" label="Credits today" value={formatMoney(floatStats.creditsToday)} caption="Since midnight" series={smoothSeries("float-credits", 26)} />
-        <StatCard variant="inline" icon="arrowDown" label="Debits today" value={formatMoney(floatStats.debitsToday)} caption="Since midnight" series={smoothSeries("float-debits", 26)} />
-        <StatCard variant="inline" icon="audit" label="Ledger entries" value={formatNumber(floatStats.entries)} caption="This period" series={smoothSeries("float-entries", 26)} />
+      <div className="float-tiles">
+        <StatCard
+          variant="inline"
+          icon="wallet"
+          label="USD float balance"
+          value={formatMoneyPlain(floatStats.balance)}
+          caption={floatStats.status}
+          series={smoothSeries("float-balance", 26)}
+        />
+        <StatCard
+          variant="inline"
+          icon="custody"
+          label="Custody (all assets)"
+          value={custodySummaryLine}
+          valueScale="xs"
+          caption={`${floatStats.entries} journal entries this period`}
+        />
+        <StatCard
+          variant="inline"
+          icon="globe"
+          label="Environment"
+          value={tenant.mode}
+          caption={tenant.environmentLabel}
+        />
       </div>
+
+      <ConvertCard />
 
       <section className="panel-card u-mb-md">
         <div className="panel-card__head" style={{ paddingBottom: 0 }}>
           <div>
             <h2 className="panel-card__title">Balance trend</h2>
-            <p className="panel-card__sub">Closing balance per day, {floatSummary.currency}</p>
+            <p className="panel-card__sub">
+              Closing balance per day, {floatSummary.currency}
+            </p>
           </div>
-          <button
-            type="button"
-            className="btn btn--outline btn--sm"
-            onClick={() =>
-              dispatch(
-                pushToast({
-                  tone: "info",
-                  title: "Top up float",
-                  text: "Wire instructions were emailed to the treasury contact.",
-                })
-              )
-            }
-          >
-            <Icon name="upload" size={16} />
-            Top up
-          </button>
+          <Badge tone="success" uppercase>
+            {floatStats.status.toUpperCase()}
+          </Badge>
         </div>
 
         <AreaChart points={floatSummary.series} height={240} />
       </section>
 
+      <h2 className="section-title">Journal entries</h2>
       <TableCard
         state={state}
         columns={columns}
         rowKey={(row) => row.id}
-        minWidth={1080}
-        searchPlaceholder="Search entry or description..."
+        minWidth={1120}
+        searchPlaceholder="Search reference, reason..."
         unit="entries"
+        toolbarRight={
+          <>
+            <SelectFilter
+              label="Direction"
+              value={direction}
+              onChange={setDirection}
+              options={DIRECTION_OPTIONS}
+            />
+            <SelectFilter
+              label="Reason"
+              value={reason}
+              onChange={setReason}
+              options={JOURNAL_REASON_OPTIONS}
+            />
+          </>
+        }
       />
     </div>
   );

@@ -1,102 +1,133 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import PageHeader from "@/Components/PageHeader/PageHeader";
 import DateRangePicker from "@/Components/DateRangePicker/DateRangePicker";
 import StatCard from "@/Components/StatCard/StatCard";
 import TableCard from "@/Components/Table/TableCard";
+import SelectFilter from "@/Components/Table/SelectFilter";
 import RefCell from "@/Components/Table/RefCell";
 import RowMenu from "@/Components/Table/RowMenu";
-import FilterMenu from "@/Components/Table/FilterMenu";
 import ExportButton from "@/Components/Table/ExportButton";
 import CoinIcon from "@/Components/Badge/CoinIcon";
 import Badge from "@/Components/Badge/Badge";
-import Icon from "@/Components/Icons/Icon";
 import useTableState from "@/customHooks/useTableState";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { clearFilters, selectStatuses, toggleStatus } from "@/redux/reducers/filtersSlice";
+import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/toastSlice";
+import {
+  CRYPTO_ASSET_OPTIONS,
+  CRYPTO_REASON_OPTIONS,
+  DIRECTION_OPTIONS,
+} from "@/types/constants";
 import type { Column, CryptoTx } from "@/types/global";
-import { cryptoTxs as seededTxs, cryptoStats } from "@/utils/mockData/cryptoTxs";
+import { cryptoTxs, cryptoStats } from "@/utils/mockData/cryptoTxs";
 import { explorerLink } from "@/utils/coins";
-import { formatDateTimeNumeric, formatMoney, formatNumber } from "@/utils/helper";
+import { formatDateTimeNumeric, formatNumber, truncateMiddle } from "@/utils/helper";
 
-const RESOURCE = "cryptoTxs";
-const STATUSES = ["Confirmed", "Pending", "Failed"] as const;
+/** utils/coins keys explorers by display name, the API by chain slug. */
+const CHAIN_NETWORKS: Record<string, string> = {
+  tron: "TRON",
+  eth: "Ethereum",
+  polygon: "Polygon",
+  bsc: "BSC",
+};
 
 export default function CryptoTxs() {
   const dispatch = useAppDispatch();
-  const selected = useAppSelector(selectStatuses(RESOURCE));
+
+  const [asset, setAsset] = useState("");
+  const [dir, setDir] = useState("");
+  const [reason, setReason] = useState("");
 
   const filter = useMemo(() => {
-    if (!selected.length) return undefined;
-    return (row: CryptoTx) => selected.includes(row.status);
-  }, [selected]);
+    if (!asset && !dir && !reason) return undefined;
+    return (row: CryptoTx) =>
+      (!asset || row.asset === asset) &&
+      (!dir || row.dir === dir) &&
+      (!reason || row.reason === reason);
+  }, [asset, dir, reason]);
 
   const state = useTableState<CryptoTx>({
-    rows: seededTxs,
+    rows: cryptoTxs,
     filter,
-    searchFields: (row) => [row.hash, row.asset, row.network, row.status],
-    sortValue: (row, key) => (row as unknown as Record<string, string | number>)[key] ?? null,
+    searchFields: (row) => [row.refId, row.txHash, row.asset, row.chain, row.reason],
+    sortValue: (row, key) =>
+      key === "amount"
+        ? Number(row.amount)
+        : (row as unknown as Record<string, string>)[key] ?? null,
   });
 
   const columns: Column<CryptoTx>[] = [
     {
-      key: "hash",
-      header: "Tx hash",
+      key: "createdAt",
+      header: "Date",
       sortable: true,
-      render: (row) => <RefCell value={row.hash} truncate={{ head: 10, tail: 8 }} />,
+      cellClassName: "dt__nowrap",
+      render: (row) => formatDateTimeNumeric(row.createdAt),
+    },
+    {
+      key: "refId",
+      header: "Ref ID",
+      sortable: true,
+      render: (row) =>
+        row.refId === "_pool" ? (
+          <span className="dt__mono dt__muted" title="Tenant pool movement">
+            _pool
+          </span>
+        ) : (
+          <RefCell value={row.refId} />
+        ),
+    },
+    {
+      key: "dir",
+      header: "Dir",
+      sortable: true,
+      render: (row) => (
+        <Badge tone={row.dir === "credit" ? "success" : "neutral"}>{row.dir}</Badge>
+      ),
     },
     {
       key: "asset",
       header: "Asset",
       sortable: true,
       render: (row) => (
-        <span className="u-row" style={{ gap: 9 }}>
-          <CoinIcon symbol={row.asset} size={22} />
+        <span className="u-row" style={{ gap: 8 }}>
+          <CoinIcon symbol={row.asset} size={20} />
           <span className="dt__strong">{row.asset}</span>
         </span>
       ),
     },
-    { key: "network", header: "Network", sortable: true, render: (row) => row.network },
     {
-      key: "direction",
-      header: "Direction",
-      align: "center",
-      sortable: true,
-      render: (row) => (
-        <Badge tone={row.direction === "in" ? "success" : "neutral"}>
-          {row.direction === "in" ? "Deposit" : "Withdrawal"}
-        </Badge>
-      ),
+      key: "chain",
+      header: "Chain",
+      render: (row) => <span className="tag">{row.chain}</span>,
     },
     {
       key: "amount",
       header: "Amount",
       align: "right",
-      render: (row) => <span className="dt__strong">{row.amount}</span>,
+      sortable: true,
+      render: (row) => (
+        <span className="dt__strong">
+          {row.amount} {row.asset}
+        </span>
+      ),
     },
     {
-      key: "usdValue",
-      header: "USD value",
-      align: "right",
+      key: "reason",
+      header: "Reason",
       sortable: true,
-      render: (row) => formatMoney(row.usdValue),
+      render: (row) => <span className="dt__mono">{row.reason}</span>,
     },
     {
-      key: "confirmations",
-      header: "Conf.",
-      align: "center",
-      sortable: true,
-      render: (row) => row.confirmations,
-    },
-    { key: "status", header: "Status", sortable: true, render: (row) => <Badge>{row.status}</Badge> },
-    {
-      key: "createdAt",
-      header: "Created",
-      sortable: true,
-      cellClassName: "dt__nowrap",
-      render: (row) => formatDateTimeNumeric(row.createdAt),
+      key: "txHash",
+      header: "Tx hash",
+      render: (row) =>
+        row.txHash ? (
+          <RefCell value={row.txHash} truncate={{ head: 12, tail: 0 }} />
+        ) : (
+          <span className="dt__muted">—</span>
+        ),
     },
     {
       key: "action",
@@ -112,28 +143,37 @@ export default function CryptoTxs() {
                 label: "Open in explorer",
                 icon: "external",
                 onSelect: () => {
-                  const url = explorerLink(row.network, row.hash);
+                  const network = CHAIN_NETWORKS[row.chain] ?? row.chain;
+                  const url = row.txHash ? explorerLink(network, row.txHash) : null;
                   if (url) window.open(url, "_blank", "noopener,noreferrer");
                   else
                     dispatch(
                       pushToast({
                         tone: "info",
-                        title: "No explorer configured",
-                        text: row.network,
+                        title: "No on-chain hash",
+                        text: "Internal pool movements are book entries only.",
                       })
                     );
                 },
               },
               {
-                label: "Re-check confirmations",
-                icon: "refresh",
+                label: "Copy amount",
+                icon: "copy",
                 onSelect: () =>
                   dispatch(
                     pushToast({
-                      tone: "info",
-                      title: "Re-checking",
-                      text: `${row.confirmations} confirmations so far`,
+                      tone: "success",
+                      title: "Copied",
+                      text: `${row.amount} ${row.asset}`,
                     })
+                  ),
+              },
+              {
+                label: "Re-check status",
+                icon: "refresh",
+                onSelect: () =>
+                  dispatch(
+                    pushToast({ tone: "info", title: "Re-checking", text: row.chain })
                   ),
               },
             ]}
@@ -146,8 +186,9 @@ export default function CryptoTxs() {
   return (
     <div className="listing">
       <PageHeader
-        title="Crypto txs"
+        title="Crypto transactions"
         crumbs={[{ label: "Dashboard", href: "/" }, { label: "Crypto txs" }]}
+        subtitle="Deposits, withdrawals, settlements across custody"
         actions={
           <>
             <DateRangePicker />
@@ -155,15 +196,14 @@ export default function CryptoTxs() {
               filename="crypto-transactions.csv"
               rows={state.pageRows}
               columns={[
-                { label: "Hash", value: (r) => r.hash },
+                { label: "Date", value: (r) => r.createdAt },
+                { label: "Ref ID", value: (r) => r.refId },
+                { label: "Direction", value: (r) => r.dir },
                 { label: "Asset", value: (r) => r.asset },
-                { label: "Network", value: (r) => r.network },
-                { label: "Direction", value: (r) => r.direction },
+                { label: "Chain", value: (r) => r.chain },
                 { label: "Amount", value: (r) => r.amount },
-                { label: "USD value", value: (r) => r.usdValue },
-                { label: "Confirmations", value: (r) => r.confirmations },
-                { label: "Status", value: (r) => r.status },
-                { label: "Created", value: (r) => r.createdAt },
+                { label: "Reason", value: (r) => r.reason },
+                { label: "Tx hash", value: (r) => r.txHash },
               ]}
             />
           </>
@@ -172,39 +212,38 @@ export default function CryptoTxs() {
 
       <div className="stat-grid listing__stats">
         <StatCard variant="inline" icon="crypto" label="Crypto txs" value={formatNumber(cryptoStats.total)} caption="This period" series={cryptoStats.series.total} />
-        <StatCard variant="inline" icon="checkCircle" label="Confirmed" value={formatNumber(cryptoStats.confirmed)} caption="This period" series={cryptoStats.series.confirmed} />
-        <StatCard variant="inline" icon="clock" label="Pending" value={formatNumber(cryptoStats.pending)} caption="Right now" series={cryptoStats.series.pending} />
-        <StatCard variant="inline" icon="wallet" label="Inbound value" value={formatMoney(cryptoStats.inboundUsd)} caption="This period" series={cryptoStats.series.inbound} />
+        <StatCard variant="inline" icon="arrowDown" label="Deposits" value={formatNumber(cryptoStats.deposits)} caption="This period" series={cryptoStats.series.deposits} />
+        <StatCard variant="inline" icon="transactions" label="Settlements" value={formatNumber(cryptoStats.settlements)} caption="Pool → float" series={cryptoStats.series.settlements} />
+        <StatCard variant="inline" icon="arrowUp" label="Withdrawals" value={formatNumber(cryptoStats.withdrawals)} caption="This period" series={cryptoStats.series.withdrawals} />
       </div>
 
       <TableCard
         state={state}
         columns={columns}
         rowKey={(row) => row.id}
-        minWidth={1340}
-        searchPlaceholder="Search hash, asset or network..."
+        minWidth={1380}
+        searchPlaceholder="Search ref ID, tx hash..."
         unit="transactions"
         toolbarRight={
           <>
-            <FilterMenu
-              options={STATUSES}
-              selected={selected}
-              showCaret
-              onToggle={(status) => dispatch(toggleStatus({ resource: RESOURCE, status }))}
-              onClear={() => dispatch(clearFilters(RESOURCE))}
+            <SelectFilter
+              label="Asset"
+              value={asset}
+              onChange={setAsset}
+              options={CRYPTO_ASSET_OPTIONS}
             />
-            <button
-              type="button"
-              className="btn btn--ghost"
-              onClick={() =>
-                dispatch(
-                  pushToast({ tone: "info", title: "Syncing", text: "Re-scanning all networks…" })
-                )
-              }
-            >
-              <Icon name="refresh" size={16} />
-              <span>Sync</span>
-            </button>
+            <SelectFilter
+              label="Direction"
+              value={dir}
+              onChange={setDir}
+              options={DIRECTION_OPTIONS}
+            />
+            <SelectFilter
+              label="Reason"
+              value={reason}
+              onChange={setReason}
+              options={CRYPTO_REASON_OPTIONS}
+            />
           </>
         }
       />

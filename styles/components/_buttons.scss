@@ -114,6 +114,19 @@
   }
 }
 
+// inline destructive text action inside a table row
+.link-danger {
+  color: var(--red-text);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
 .icon-action {
   @include center;
   @include size(28px);

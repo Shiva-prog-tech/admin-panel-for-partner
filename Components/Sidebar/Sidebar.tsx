@@ -8,6 +8,7 @@ import BrandMark from "@/Components/Icons/BrandMark";
 import SidebarWaves from "@/Components/Icons/SidebarWaves";
 import Avatar from "@/Components/Avatar/Avatar";
 import useClickOutside from "@/customHooks/useClickOutside";
+import useSignOut from "@/customHooks/useSignOut";
 import { useAppSelector } from "@/redux/hooks";
 import { APP_NAME, APP_TAGLINE, NAV_ITEMS } from "@/types/constants";
 import { cx } from "@/utils/helper";
@@ -25,6 +26,7 @@ function isActive(pathname: string, href: string): boolean {
 export default function Sidebar({ open, onNavigate }: SidebarProps) {
   const pathname = usePathname();
   const user = useAppSelector((state) => state.auth.user);
+  const signOut = useSignOut();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useClickOutside<HTMLDivElement>(menuOpen, () => setMenuOpen(false));
 
@@ -99,7 +101,15 @@ export default function Sidebar({ open, onNavigate }: SidebarProps) {
                 My activity
               </Link>
               <div className="popover__divider" />
-              <button type="button" className="menu-item menu-item--danger" role="menuitem">
+              <button
+                type="button"
+                className="menu-item menu-item--danger"
+                role="menuitem"
+                onClick={() => {
+                  setMenuOpen(false);
+                  void signOut();
+                }}
+              >
                 <Icon name="logout" size={16} />
                 Sign out
               </button>

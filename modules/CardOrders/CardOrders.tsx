@@ -1,57 +1,78 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import PageHeader from "@/Components/PageHeader/PageHeader";
 import DateRangePicker from "@/Components/DateRangePicker/DateRangePicker";
 import StatCard from "@/Components/StatCard/StatCard";
 import TableCard from "@/Components/Table/TableCard";
+import SelectFilter from "@/Components/Table/SelectFilter";
 import RefCell from "@/Components/Table/RefCell";
 import RowMenu from "@/Components/Table/RowMenu";
-import FilterMenu from "@/Components/Table/FilterMenu";
 import ExportButton from "@/Components/Table/ExportButton";
 import Badge from "@/Components/Badge/Badge";
 import useTableState from "@/customHooks/useTableState";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { clearFilters, selectStatuses, toggleStatus } from "@/redux/reducers/filtersSlice";
+import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/toastSlice";
-import type { CardOrder, Column } from "@/types/global";
-import { cardOrders as seededOrders, cardOrderStats } from "@/utils/mockData/cardOrders";
-import { formatDateTimeNumeric, formatNumber, truncateMiddle } from "@/utils/helper";
+import { CARD_ORDER_STATUSES } from "@/types/constants";
+import type { CardOrder, Column, SelectOption } from "@/types/global";
+import { cardOrders, cardOrderStats } from "@/utils/mockData/cardOrders";
+import { formatDateTimeNumeric, formatNumber } from "@/utils/helper";
 
-const RESOURCE = "cardOrders";
-const STATUSES = ["Delivered", "Shipped", "In production", "Requested", "Cancelled"] as const;
+const STATUS_OPTIONS: SelectOption[] = [
+  { value: "", label: "All statuses" },
+  ...CARD_ORDER_STATUSES.map((status) => ({ value: status, label: status })),
+];
 
 export default function CardOrders() {
   const dispatch = useAppDispatch();
-  const selected = useAppSelector(selectStatuses(RESOURCE));
+  const [status, setStatus] = useState("");
 
   const filter = useMemo(() => {
-    if (!selected.length) return undefined;
-    return (row: CardOrder) => selected.includes(row.status);
-  }, [selected]);
+    if (!status) return undefined;
+    return (row: CardOrder) => row.status === status;
+  }, [status]);
 
   const state = useTableState<CardOrder>({
-    rows: seededOrders,
+    rows: cardOrders,
     filter,
-    searchFields: (row) => [row.refId, row.cardholderRef, row.product, row.destination, row.status],
-    sortValue: (row, key) => (row as unknown as Record<string, string | number>)[key] ?? null,
+    searchFields: (row) => [
+      row.order,
+      row.refId,
+      row.recipient,
+      row.country,
+      row.tracking,
+      row.status,
+    ],
+    sortValue: (row, key) =>
+      (row as unknown as Record<string, string | number | null>)[key] ?? null,
   });
 
   const columns: Column<CardOrder>[] = [
-    { key: "refId", header: "Ref ID", sortable: true, render: (row) => <RefCell value={row.refId} /> },
     {
-      key: "cardholderRef",
-      header: "Cardholder",
-      render: (row) => (
-        <span className="dt__mono" title={row.cardholderRef}>
-          {truncateMiddle(row.cardholderRef, 8, 6)}
-        </span>
-      ),
+      key: "order",
+      header: "Order",
+      sortable: true,
+      render: (row) => <span className="dt__mono dt__strong">{row.order}</span>,
     },
-    { key: "product", header: "Product", sortable: true, render: (row) => <span className="dt__strong">{row.product}</span> },
-    { key: "quantity", header: "Qty", align: "center", sortable: true, render: (row) => row.quantity },
-    { key: "destination", header: "Destination", sortable: true, render: (row) => row.destination },
+    {
+      key: "refId",
+      header: "Ref ID",
+      sortable: true,
+      render: (row) => <RefCell value={row.refId} />,
+    },
     { key: "status", header: "Status", sortable: true, render: (row) => <Badge>{row.status}</Badge> },
+    { key: "recipient", header: "Recipient", render: (row) => row.recipient },
+    { key: "country", header: "Country", render: (row) => row.country },
+    {
+      key: "tracking",
+      header: "Tracking",
+      render: (row) =>
+        row.tracking ? (
+          <span className="dt__mono">{row.tracking}</span>
+        ) : (
+          <span className="dt__muted">—</span>
+        ),
+    },
     {
       key: "createdAt",
       header: "Created",
@@ -73,20 +94,26 @@ export default function CardOrders() {
                 label: "Track shipment",
                 icon: "external",
                 onSelect: () =>
-                  dispatch(pushToast({ tone: "info", title: "Tracking", text: row.destination })),
+                  dispatch(
+                    pushToast({
+                      tone: row.tracking ? "info" : "error",
+                      title: row.tracking ? "Tracking" : "Not shipped yet",
+                      text: row.tracking ?? row.country,
+                    })
+                  ),
               },
               {
                 label: "Reprint order",
                 icon: "refresh",
                 onSelect: () =>
-                  dispatch(pushToast({ tone: "success", title: "Reprint queued", text: row.refId })),
+                  dispatch(pushToast({ tone: "success", title: "Reprint queued", text: row.order })),
               },
               {
                 label: "Cancel order",
                 icon: "ban",
                 danger: true,
                 onSelect: () =>
-                  dispatch(pushToast({ tone: "info", title: "Order cancelled", text: row.refId })),
+                  dispatch(pushToast({ tone: "info", title: "Order cancelled", text: row.order })),
               },
             ]}
           />
@@ -98,21 +125,22 @@ export default function CardOrders() {
   return (
     <div className="listing">
       <PageHeader
-        title="Card orders"
+        title="Physical card orders"
         crumbs={[{ label: "Dashboard", href: "/" }, { label: "Card orders" }]}
+        subtitle="Plastic fulfilment and courier tracking"
         actions={
           <>
             <DateRangePicker />
             <ExportButton
-              filename="card-orders.csv"
+              filename="physical-card-orders.csv"
               rows={state.pageRows}
               columns={[
+                { label: "Order", value: (r) => r.order },
                 { label: "Ref ID", value: (r) => r.refId },
-                { label: "Cardholder", value: (r) => r.cardholderRef },
-                { label: "Product", value: (r) => r.product },
-                { label: "Quantity", value: (r) => r.quantity },
-                { label: "Destination", value: (r) => r.destination },
                 { label: "Status", value: (r) => r.status },
+                { label: "Recipient", value: (r) => r.recipient },
+                { label: "Country", value: (r) => r.country },
+                { label: "Tracking", value: (r) => r.tracking },
                 { label: "Created", value: (r) => r.createdAt },
               ]}
             />
@@ -123,24 +151,25 @@ export default function CardOrders() {
       <div className="stat-grid listing__stats">
         <StatCard variant="inline" icon="package" label="Total orders" value={formatNumber(cardOrderStats.total)} caption="All time" series={cardOrderStats.series.total} />
         <StatCard variant="inline" icon="checkCircle" label="Delivered" value={formatNumber(cardOrderStats.delivered)} caption="All time" series={cardOrderStats.series.delivered} />
-        <StatCard variant="inline" icon="send" label="In transit" value={formatNumber(cardOrderStats.inTransit)} caption="Right now" series={cardOrderStats.series.transit} />
-        <StatCard variant="inline" icon="clock" label="Awaiting production" value={formatNumber(cardOrderStats.pending)} caption="Right now" series={cardOrderStats.series.pending} />
+        <StatCard variant="inline" icon="send" label="Shipped" value={formatNumber(cardOrderStats.shipped)} caption="In transit" series={cardOrderStats.series.shipped} />
+        <StatCard variant="inline" icon="clock" label="Pending" value={formatNumber(cardOrderStats.pending)} caption="Awaiting production" series={cardOrderStats.series.pending} />
       </div>
 
       <TableCard
         state={state}
         columns={columns}
         rowKey={(row) => row.id}
-        minWidth={1160}
-        searchPlaceholder="Search ref ID or destination..."
+        minWidth={1320}
+        searchPlaceholder="Search ref ID, recipient..."
         unit="orders"
+        emptyTitle="No results"
+        emptyText="No physical card orders match the current status filter."
         toolbarRight={
-          <FilterMenu
-            options={STATUSES}
-            selected={selected}
-            showCaret
-            onToggle={(status) => dispatch(toggleStatus({ resource: RESOURCE, status }))}
-            onClear={() => dispatch(clearFilters(RESOURCE))}
+          <SelectFilter
+            label="Order status"
+            value={status}
+            onChange={setStatus}
+            options={STATUS_OPTIONS}
           />
         }
       />

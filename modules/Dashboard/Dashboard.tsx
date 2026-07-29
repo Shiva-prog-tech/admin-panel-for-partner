@@ -30,6 +30,7 @@ export default function Dashboard() {
             value={tile.value}
             icon={tile.icon as IconName}
             variant="stacked"
+            caption={tile.caption}
             delta={tile.delta}
             series={tile.series}
           />

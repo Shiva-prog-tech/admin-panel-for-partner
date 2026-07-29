@@ -1,13 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import PageHeader from "@/Components/PageHeader/PageHeader";
 import DateRangePicker from "@/Components/DateRangePicker/DateRangePicker";
 import StatCard from "@/Components/StatCard/StatCard";
 import TableCard from "@/Components/Table/TableCard";
-import RowMenu from "@/Components/Table/RowMenu";
 import ExportButton from "@/Components/Table/ExportButton";
 import Badge from "@/Components/Badge/Badge";
 import Icon from "@/Components/Icons/Icon";
+import ConfirmPopup from "@/Components/PopUps/ConfirmPopup";
 import useTableState from "@/customHooks/useTableState";
 import useCopyToClipboard from "@/customHooks/useCopyToClipboard";
 import { useAppDispatch } from "@/redux/hooks";
@@ -15,47 +16,64 @@ import { pushToast } from "@/redux/reducers/toastSlice";
 import type { ApiKey, Column } from "@/types/global";
 import { apiKeys, apiKeyStats } from "@/utils/mockData/apiKeys";
 import { DATASET_NOW } from "@/utils/Config";
-import { formatDateLong, formatNumber, relativeFrom, smoothSeries } from "@/utils/helper";
+import { formatDateTimeNumeric, formatNumber, relativeFrom, smoothSeries } from "@/utils/helper";
 
 export default function ApiKeys() {
   const dispatch = useAppDispatch();
   const { copy } = useCopyToClipboard();
+  const [revokeTarget, setRevokeTarget] = useState<ApiKey | null>(null);
 
   const state = useTableState<ApiKey>({
     rows: apiKeys,
-    searchFields: (row) => [row.label, row.prefix, row.scope, row.environment, row.state],
-    sortValue: (row, key) => (row as unknown as Record<string, string | number>)[key] ?? null,
+    searchFields: (row) => [row.prefix, row.label, row.scope, row.environment, row.state],
+    sortValue: (row, key) =>
+      (row as unknown as Record<string, string | number | null>)[key] ?? null,
   });
 
   const columns: Column<ApiKey>[] = [
     {
-      key: "label",
-      header: "Label",
+      key: "prefix",
+      header: "Prefix",
       sortable: true,
       render: (row) => (
-        <span className="u-row" style={{ gap: 9 }}>
-          <Icon name="key" size={16} />
-          <span className="dt__strong">{row.label}</span>
+        <span className="u-row" style={{ gap: 8 }}>
+          <Icon name="key" size={15} />
+          <button
+            type="button"
+            className="dt__mono dt__ref-id"
+            title="Copy key prefix"
+            onClick={async () => {
+              await copy(row.prefix);
+              dispatch(
+                pushToast({ tone: "success", title: "Key prefix copied", text: row.prefix })
+              );
+            }}
+          >
+            {row.prefix}
+          </button>
         </span>
       ),
     },
     {
-      key: "prefix",
-      header: "Key",
-      render: (row) => (
-        <button
-          type="button"
-          className="dt__mono dt__ref-id"
-          onClick={async () => {
-            await copy(row.prefix);
-            dispatch(
-              pushToast({ tone: "success", title: "Key prefix copied", text: row.prefix })
-            );
-          }}
-        >
-          {row.prefix}••••••••
-        </button>
-      ),
+      key: "label",
+      header: "Label",
+      sortable: true,
+      render: (row) => <span className="dt__strong">{row.label}</span>,
+    },
+    { key: "state", header: "Status", sortable: true, render: (row) => <Badge>{row.state}</Badge> },
+    {
+      key: "lastUsed",
+      header: "Last used",
+      sortable: true,
+      cellClassName: "dt__nowrap",
+      render: (row) =>
+        row.lastUsed ? (
+          <span title={relativeFrom(row.lastUsed, DATASET_NOW)}>
+            {formatDateTimeNumeric(row.lastUsed)}
+          </span>
+        ) : (
+          <span className="dt__muted">never</span>
+        ),
     },
     {
       key: "scope",
@@ -78,64 +96,23 @@ export default function ApiKeys() {
       ),
     },
     {
-      key: "lastUsed",
-      header: "Last used",
-      sortable: true,
-      cellClassName: "dt__nowrap",
-      render: (row) =>
-        row.lastUsed ? (
-          relativeFrom(row.lastUsed, DATASET_NOW)
-        ) : (
-          <span className="dt__muted">never</span>
-        ),
-    },
-    { key: "state", header: "State", sortable: true, render: (row) => <Badge>{row.state}</Badge> },
-    {
-      key: "createdAt",
-      header: "Created",
-      sortable: true,
-      cellClassName: "dt__nowrap",
-      render: (row) => formatDateLong(row.createdAt),
-    },
-    {
       key: "action",
-      header: "Action",
+      header: "",
       align: "right",
       headerClassName: "dt__action",
       cellClassName: "dt__action",
-      render: (row) => (
-        <span className="dt__action-inner">
-          <RowMenu
-            actions={[
-              {
-                label: "Roll key",
-                icon: "refresh",
-                onSelect: () =>
-                  dispatch(
-                    pushToast({
-                      tone: "success",
-                      title: "Key rolled",
-                      text: "The previous secret stays valid for 24 hours.",
-                    })
-                  ),
-              },
-              {
-                label: "View usage",
-                icon: "activity",
-                onSelect: () =>
-                  dispatch(pushToast({ tone: "info", title: "Usage", text: row.label })),
-              },
-              {
-                label: "Revoke key",
-                icon: "ban",
-                danger: true,
-                onSelect: () =>
-                  dispatch(pushToast({ tone: "info", title: "Key revoked", text: row.label })),
-              },
-            ]}
-          />
-        </span>
-      ),
+      render: (row) =>
+        row.state === "Revoked" ? (
+          <span className="dt__muted">—</span>
+        ) : (
+          <button
+            type="button"
+            className="link-danger"
+            onClick={() => setRevokeTarget(row)}
+          >
+            Revoke
+          </button>
+        ),
     },
   ];
 
@@ -144,6 +121,7 @@ export default function ApiKeys() {
       <PageHeader
         title="API keys"
         crumbs={[{ label: "Dashboard", href: "/" }, { label: "API keys" }]}
+        subtitle="Credentials your integration uses to call the partner API"
         actions={
           <>
             <DateRangePicker />
@@ -151,12 +129,12 @@ export default function ApiKeys() {
               filename="api-keys.csv"
               rows={state.pageRows}
               columns={[
-                { label: "Label", value: (r) => r.label },
                 { label: "Prefix", value: (r) => r.prefix },
+                { label: "Label", value: (r) => r.label },
+                { label: "Status", value: (r) => r.state },
+                { label: "Last used", value: (r) => r.lastUsed },
                 { label: "Scope", value: (r) => r.scope },
                 { label: "Environment", value: (r) => r.environment },
-                { label: "Last used", value: (r) => r.lastUsed },
-                { label: "State", value: (r) => r.state },
                 { label: "Created", value: (r) => r.createdAt },
               ]}
             />
@@ -168,15 +146,16 @@ export default function ApiKeys() {
         <StatCard variant="inline" icon="key" label="Total keys" value={formatNumber(apiKeyStats.total)} caption="All environments" series={smoothSeries("ak-total", 26)} />
         <StatCard variant="inline" icon="checkCircle" label="Active" value={formatNumber(apiKeyStats.active)} caption="Usable now" series={smoothSeries("ak-active", 26)} />
         <StatCard variant="inline" icon="shield" label="Live keys" value={formatNumber(apiKeyStats.live)} caption="Production" series={smoothSeries("ak-live", 26)} />
-        <StatCard variant="inline" icon="activity" label="API calls (24h)" value={formatNumber(apiKeyStats.calls24h)} caption="Last 24 hours" series={smoothSeries("ak-calls", 26)} />
+        <StatCard variant="inline" icon="activity" label="API calls (24h)" value={formatNumber(apiKeyStats.calls24h)} caption="Machine API traffic" series={smoothSeries("ak-calls", 26)} />
       </div>
 
+      <h2 className="section-title">Keys</h2>
       <TableCard
         state={state}
         columns={columns}
         rowKey={(row) => row.id}
-        minWidth={1220}
-        searchPlaceholder="Search label or prefix..."
+        minWidth={1180}
+        searchPlaceholder="Search prefix or label..."
         unit="keys"
         toolbarRight={
           <button
@@ -186,7 +165,7 @@ export default function ApiKeys() {
               dispatch(
                 pushToast({
                   tone: "info",
-                  title: "Create API key",
+                  title: "Create key",
                   text: "The secret is shown once — store it in your vault immediately.",
                 })
               )
@@ -195,6 +174,24 @@ export default function ApiKeys() {
             <Icon name="plus" size={17} />
             <span>Create key</span>
           </button>
+        }
+      />
+
+      <ConfirmPopup
+        open={revokeTarget !== null}
+        title="Revoke this API key?"
+        message={`${revokeTarget?.prefix ?? ""} stops working immediately. Any integration still using it will receive 401 responses.`}
+        confirmLabel="Revoke key"
+        danger
+        onClose={() => setRevokeTarget(null)}
+        onConfirm={() =>
+          dispatch(
+            pushToast({
+              tone: "success",
+              title: "Key revoked",
+              text: revokeTarget?.prefix,
+            })
+          )
         }
       />
     </div>

@@ -36,8 +36,9 @@ export const dashboardTiles: MetricTile[] = [
   {
     id: "api-calls",
     label: "API calls (24h)",
-    value: "3084",
+    value: "3083",
     icon: "activity",
+    caption: "Machine API traffic",
     delta: { value: 21.6, direction: "up", label: "from last week" },
     series: jaggedSeries("dash-api-calls", 36, 54, 30),
   },

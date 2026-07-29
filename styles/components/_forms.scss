@@ -100,6 +100,18 @@
     border-radius: var(--r-sm);
     font-size: 13px;
   }
+
+  // a filter that is narrowing the table reads as amber
+  &--active select {
+    border-color: var(--border-amber);
+    background: var(--bg-amber-tint);
+    color: var(--brand-ink);
+    font-weight: 600;
+  }
+
+  &--active &__caret {
+    color: var(--brand-strong);
+  }
 }
 
 .range-picker {

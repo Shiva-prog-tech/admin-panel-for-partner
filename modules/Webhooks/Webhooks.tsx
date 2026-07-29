@@ -1,86 +1,83 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import PageHeader from "@/Components/PageHeader/PageHeader";
 import DateRangePicker from "@/Components/DateRangePicker/DateRangePicker";
 import StatCard from "@/Components/StatCard/StatCard";
 import TableCard from "@/Components/Table/TableCard";
+import SelectFilter from "@/Components/Table/SelectFilter";
 import RowMenu from "@/Components/Table/RowMenu";
 import ExportButton from "@/Components/Table/ExportButton";
 import Badge from "@/Components/Badge/Badge";
 import Icon from "@/Components/Icons/Icon";
+import WebhookConfigCard from "./WebhookConfigCard";
 import useTableState from "@/customHooks/useTableState";
 import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/toastSlice";
-import type { Column, WebhookEndpoint } from "@/types/global";
-import { webhookEndpoints, webhookStats } from "@/utils/mockData/webhooks";
-import { DATASET_NOW } from "@/utils/Config";
-import { formatNumber, formatPercent, relativeFrom } from "@/utils/helper";
+import { DELIVERY_STATUS_OPTIONS } from "@/types/constants";
+import type { Column, WebhookDelivery } from "@/types/global";
+import {
+  webhookDeliveries,
+  deliveryStats,
+} from "@/utils/mockData/webhookDeliveries";
+import { webhookStats } from "@/utils/mockData/webhooks";
+import { formatDateTimeNumeric, formatNumber } from "@/utils/helper";
 
 export default function Webhooks() {
   const dispatch = useAppDispatch();
+  const [status, setStatus] = useState("");
 
-  const state = useTableState<WebhookEndpoint>({
-    rows: webhookEndpoints,
-    searchFields: (row) => [row.url, row.state, ...row.events],
-    sortValue: (row, key) => (row as unknown as Record<string, string | number>)[key] ?? null,
-    pageSize: 10,
+  const filter = useMemo(() => {
+    if (!status) return undefined;
+    return (row: WebhookDelivery) => row.status === status;
+  }, [status]);
+
+  const state = useTableState<WebhookDelivery>({
+    rows: webhookDeliveries,
+    filter,
+    searchFields: (row) => [row.event, row.refId, row.status, row.error],
+    sortValue: (row, key) =>
+      (row as unknown as Record<string, string | number>)[key] ?? null,
   });
 
-  const columns: Column<WebhookEndpoint>[] = [
+  const columns: Column<WebhookDelivery>[] = [
     {
-      key: "url",
-      header: "Endpoint",
-      sortable: true,
-      render: (row) => (
-        <span className="u-row" style={{ gap: 9 }}>
-          <Icon name="webhook" size={16} />
-          <span className="dt__strong dt__mono">{row.url}</span>
-        </span>
-      ),
-    },
-    {
-      key: "events",
-      header: "Events",
-      render: (row) => (
-        <span className="u-row" style={{ gap: 6, flexWrap: "wrap" }}>
-          {row.events.slice(0, 2).map((event) => (
-            <span className="tag" key={event}>
-              {event}
-            </span>
-          ))}
-          {row.events.length > 2 && <span className="tag">+{row.events.length - 2}</span>}
-        </span>
-      ),
-    },
-    {
-      key: "successRate",
-      header: "Success rate",
-      align: "right",
-      sortable: true,
-      render: (row) => (
-        <span
-          className="dt__strong"
-          style={{
-            color:
-              row.successRate >= 99.5
-                ? "var(--green-text)"
-                : row.successRate >= 95
-                  ? "var(--amber-text)"
-                  : "var(--red-text)",
-          }}
-        >
-          {formatPercent(row.successRate)}
-        </span>
-      ),
-    },
-    {
-      key: "lastDelivery",
-      header: "Last delivery",
+      key: "createdAt",
+      header: "Date",
       sortable: true,
       cellClassName: "dt__nowrap",
-      render: (row) => relativeFrom(row.lastDelivery, DATASET_NOW),
+      render: (row) => formatDateTimeNumeric(row.createdAt),
     },
-    { key: "state", header: "State", sortable: true, render: (row) => <Badge>{row.state}</Badge> },
+    {
+      key: "event",
+      header: "Event",
+      sortable: true,
+      render: (row) => <span className="dt__mono">{row.event}</span>,
+    },
+    {
+      key: "refId",
+      header: "Ref ID",
+      sortable: true,
+      render: (row) => <span className="dt__mono">{row.refId}</span>,
+    },
+    { key: "status", header: "Status", sortable: true, render: (row) => <Badge>{row.status}</Badge> },
+    {
+      key: "attempts",
+      header: "Attempts",
+      align: "center",
+      sortable: true,
+      render: (row) => row.attempts,
+    },
+    {
+      key: "error",
+      header: "Error",
+      render: (row) =>
+        row.error ? (
+          <span className="dt__reason">{row.error}</span>
+        ) : (
+          <span className="dt__muted">—</span>
+        ),
+    },
     {
       key: "action",
       header: "Action",
@@ -92,29 +89,20 @@ export default function Webhooks() {
           <RowMenu
             actions={[
               {
-                label: "Send test event",
-                icon: "send",
+                label: "View payload",
+                icon: "eye",
                 onSelect: () =>
-                  dispatch(
-                    pushToast({ tone: "success", title: "Test event queued", text: row.url })
-                  ),
+                  dispatch(pushToast({ tone: "info", title: row.event, text: row.refId })),
               },
               {
-                label: "View deliveries",
-                icon: "audit",
-                onSelect: () =>
-                  dispatch(pushToast({ tone: "info", title: "Deliveries", text: row.url })),
-              },
-              {
-                label: row.state === "Paused" ? "Resume endpoint" : "Pause endpoint",
-                icon: row.state === "Paused" ? "refresh" : "ban",
-                danger: row.state !== "Paused",
+                label: "Replay delivery",
+                icon: "refresh",
                 onSelect: () =>
                   dispatch(
                     pushToast({
-                      tone: "info",
-                      title: row.state === "Paused" ? "Endpoint resumed" : "Endpoint paused",
-                      text: row.url,
+                      tone: "success",
+                      title: "Delivery replayed",
+                      text: `${row.event} · ${row.refId}`,
                     })
                   ),
               },
@@ -130,18 +118,20 @@ export default function Webhooks() {
       <PageHeader
         title="Webhooks"
         crumbs={[{ label: "Dashboard", href: "/" }, { label: "Webhooks" }]}
+        subtitle="Outbound event delivery for this tenant"
         actions={
           <>
             <DateRangePicker />
             <ExportButton
-              filename="webhook-endpoints.csv"
+              filename="webhook-deliveries.csv"
               rows={state.pageRows}
               columns={[
-                { label: "Endpoint", value: (r) => r.url },
-                { label: "Events", value: (r) => r.events.join(" ") },
-                { label: "Success rate", value: (r) => r.successRate },
-                { label: "Last delivery", value: (r) => r.lastDelivery },
-                { label: "State", value: (r) => r.state },
+                { label: "Date", value: (r) => r.createdAt },
+                { label: "Event", value: (r) => r.event },
+                { label: "Ref ID", value: (r) => r.refId },
+                { label: "Status", value: (r) => r.status },
+                { label: "Attempts", value: (r) => r.attempts },
+                { label: "Error", value: (r) => r.error },
               ]}
             />
           </>
@@ -149,36 +139,47 @@ export default function Webhooks() {
       />
 
       <div className="stat-grid listing__stats">
-        <StatCard variant="inline" icon="webhook" label="Endpoints" value={formatNumber(webhookStats.endpoints)} caption="Configured" series={webhookStats.series.endpoints} />
-        <StatCard variant="inline" icon="checkCircle" label="Healthy" value={formatNumber(webhookStats.healthy)} caption="Right now" series={webhookStats.series.healthy} />
-        <StatCard variant="inline" icon="alert" label="Issues (7d)" value={formatNumber(webhookStats.issues7d)} caption="Last 7 days" series={webhookStats.series.issues} />
-        <StatCard variant="inline" icon="send" label="Deliveries (24h)" value={formatNumber(webhookStats.deliveries24h)} caption="Last 24 hours" series={webhookStats.series.deliveries} />
+        <StatCard variant="inline" icon="send" label="Deliveries" value={formatNumber(deliveryStats.total)} caption="This period" series={webhookStats.series.deliveries} />
+        <StatCard variant="inline" icon="checkCircle" label="Delivered" value={formatNumber(deliveryStats.delivered)} caption="This period" series={webhookStats.series.healthy} />
+        <StatCard variant="inline" icon="alert" label="Failed" value={formatNumber(deliveryStats.failed)} caption="This period" series={webhookStats.series.issues} />
+        <StatCard variant="inline" icon="clock" label="Pending" value={formatNumber(deliveryStats.pending)} caption="Awaiting retry" series={webhookStats.series.endpoints} />
       </div>
 
+      <WebhookConfigCard />
+
+      <h2 className="section-title">Delivery log</h2>
       <TableCard
         state={state}
         columns={columns}
         rowKey={(row) => row.id}
         minWidth={1180}
-        searchPlaceholder="Search endpoint or event..."
-        unit="endpoints"
+        searchPlaceholder="Search event, ref ID..."
+        unit="deliveries"
         toolbarRight={
-          <button
-            type="button"
-            className="btn btn--brand"
-            onClick={() =>
-              dispatch(
-                pushToast({
-                  tone: "info",
-                  title: "Add endpoint",
-                  text: "Provide an HTTPS URL and pick the events to subscribe to.",
-                })
-              )
-            }
-          >
-            <Icon name="plus" size={17} />
-            <span>Add endpoint</span>
-          </button>
+          <>
+            <SelectFilter
+              label="Delivery status"
+              value={status}
+              onChange={setStatus}
+              options={DELIVERY_STATUS_OPTIONS}
+            />
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={() =>
+                dispatch(
+                  pushToast({
+                    tone: "success",
+                    title: "Test event queued",
+                    text: "cardholder.updated will be delivered shortly.",
+                  })
+                )
+              }
+            >
+              <Icon name="send" size={16} />
+              <span>Send test event</span>
+            </button>
+          </>
         }
       />
     </div>

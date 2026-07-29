@@ -5,11 +5,13 @@ import PageHeader from "@/Components/PageHeader/PageHeader";
 import Icon, { type IconName } from "@/Components/Icons/Icon";
 import Badge from "@/Components/Badge/Badge";
 import Avatar from "@/Components/Avatar/Avatar";
+import DetailGrid from "@/Components/DetailGrid/DetailGrid";
 import useTheme from "@/customHooks/useTheme";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/toastSlice";
 import { SETTINGS_TABS } from "@/types/constants";
 import { Config } from "@/utils/Config";
+import { organizationInfo, profileInfo } from "@/utils/mockData/settings";
 import { cx } from "@/utils/helper";
 
 type TabId = (typeof SETTINGS_TABS)[number]["id"];
@@ -119,6 +121,54 @@ export default function Settings() {
         <div className="settings__panels">
           {tab === "general" && (
             <>
+              <section className="panel-card panel-card--divided">
+                <div className="panel-card__head">
+                  <div>
+                    <h2 className="panel-card__title">Profile</h2>
+                    <p className="panel-card__sub">
+                      The account you are signed in as.
+                    </p>
+                  </div>
+                  <Avatar size={36} name={profileInfo.name} />
+                </div>
+
+                <DetailGrid
+                  columns={1}
+                  items={[
+                    { label: "Name", value: profileInfo.name },
+                    { label: "Email", value: profileInfo.email },
+                    { label: "Role", value: profileInfo.role },
+                    { label: "Environment", value: profileInfo.environment },
+                  ]}
+                />
+              </section>
+
+              <section className="panel-card panel-card--divided">
+                <div className="panel-card__head">
+                  <div>
+                    <h2 className="panel-card__title">Organization</h2>
+                    <p className="panel-card__sub">
+                      Issued by Swipeo — read-only.
+                    </p>
+                  </div>
+                  <Icon name="building" size={18} className="u-muted" />
+                </div>
+
+                <DetailGrid
+                  columns={1}
+                  items={[
+                    { label: "Tenant", value: organizationInfo.tenant },
+                    { label: "Slug", value: organizationInfo.slug, mono: true },
+                    { label: "Rate limit", value: organizationInfo.rateLimit },
+                    {
+                      label: "Webhook URL",
+                      value: organizationInfo.webhookUrl,
+                      mono: true,
+                    },
+                  ]}
+                />
+              </section>
+
               <section className="panel-card panel-card--divided">
                 <div className="panel-card__head">
                   <div>

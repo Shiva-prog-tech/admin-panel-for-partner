@@ -15,6 +15,8 @@ interface StatCardProps {
   series?: number[];
   /** smooth curve instead of the jagged dashboard trace */
   smooth?: boolean;
+  /** shrink the headline for long composite values (e.g. custody totals) */
+  valueScale?: "md" | "sm" | "xs";
   className?: string;
 }
 
@@ -27,6 +29,7 @@ export default function StatCard({
   delta,
   series,
   smooth,
+  valueScale = "md",
   className,
 }: StatCardProps) {
   const inline = variant === "inline";
@@ -40,7 +43,14 @@ export default function StatCard({
 
         <div className="stat__meta">
           <div className="stat__label">{label}</div>
-          <div className="stat__value">{value}</div>
+          <div
+            className={cx(
+              "stat__value",
+              valueScale !== "md" && `stat__value--${valueScale}`
+            )}
+          >
+            {value}
+          </div>
           {inline && caption && <div className="stat__caption">{caption}</div>}
         </div>
 
@@ -50,6 +60,8 @@ export default function StatCard({
           </div>
         )}
       </div>
+
+      {!inline && caption && <div className="stat__caption">{caption}</div>}
 
       {!inline && delta && (
         <div className={cx("stat__delta", `stat__delta--${delta.direction}`)}>
