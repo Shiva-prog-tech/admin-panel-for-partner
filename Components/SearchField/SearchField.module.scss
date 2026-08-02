@@ -1,0 +1,25 @@
+// ===========================================================================
+// SearchField — toolbar search box
+// Transcribed from styles/components/_forms.scss (.search-field).
+// ===========================================================================
+@use "index" as *;
+
+.field {
+  @include field;
+  width: 250px;
+  max-width: 100%;
+
+  input {
+    @include reset-input;
+    font-size: 13px;
+  }
+}
+
+.wide {
+  width: 320px;
+}
+
+.icon {
+  color: var(--text-faint);
+  flex: 0 0 auto;
+}

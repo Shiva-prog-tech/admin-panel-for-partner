@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Transactions from "@/modules/Transactions/Transactions";
+import Transactions from "@/modules/TransactionModule";
 
 export const metadata: Metadata = { title: "Transactions" };
 

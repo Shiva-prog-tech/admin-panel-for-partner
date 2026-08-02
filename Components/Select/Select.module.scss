@@ -1,0 +1,78 @@
+// ===========================================================================
+// Select — shared native-select chrome.
+//
+// Transcribed from styles/components/_forms.scss (.select). Imported by
+// SelectFilter, PerPageSelect, the NavBar environment switcher, ConvertCard
+// and the create/invite modals, so the appearance is declared exactly once.
+// ===========================================================================
+@use "index" as *;
+
+.select {
+  position: relative;
+  display: inline-flex;
+
+  select {
+    appearance: none;
+    height: 38px;
+    padding: 0 32px 0 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-xs);
+    background: var(--bg-input);
+    color: var(--text-secondary);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color $fast $ease;
+
+    &:hover {
+      border-color: var(--border-strong);
+    }
+  }
+}
+
+.tall select {
+  height: 42px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+}
+
+/// A filter that is narrowing the table reads as amber.
+.active {
+  select {
+    border-color: var(--border-amber);
+    background: var(--bg-amber-tint);
+    color: var(--brand-ink);
+    font-weight: 600;
+  }
+
+  .caret {
+    color: var(--brand-strong);
+  }
+}
+
+/// Full-width variant used inside modal form rows.
+.block {
+  display: block;
+
+  select {
+    width: 100%;
+  }
+}
+
+.caret {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+// Field label when the select is rendered with one (modal form rows).
+.label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}

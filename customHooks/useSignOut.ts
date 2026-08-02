@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/redux/hooks";
-import { signOut } from "@/redux/reducers/authSlice";
+import { signOut } from "@/redux/reducers/AuthReducer";
 import authService from "@/services/auth.service";
 import { AUTH_ROUTES } from "@/types/constants";
 import { clearSession } from "@/utils/session";
@@ -26,3 +26,4 @@ export default function useSignOut() {
     }
   }, [dispatch, router]);
 }
+    

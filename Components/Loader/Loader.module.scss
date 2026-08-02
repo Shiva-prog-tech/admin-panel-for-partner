@@ -1,0 +1,57 @@
+// ===========================================================================
+// Loader — spinner, block loader and skeleton shimmer
+// Transcribed from styles/components/_overlays.scss.
+//
+// NOTE: `.spinner` is also applied as a bare string inside the auth submit
+// buttons. Until those move to this module, styles/App.scss keeps a global
+// `.spinner` with identical declarations — see STRUCTURE.md.
+// ===========================================================================
+@use "index" as *;
+
+.spinner {
+  @include size(20px);
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--brand);
+  border-radius: var(--r-pill);
+  animation: pa-spin 0.7s linear infinite;
+  flex: 0 0 auto;
+}
+
+.spinnerLg {
+  @include size(34px);
+  border-width: 3px;
+}
+
+@keyframes pa-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.block {
+  @include flex(column, center, center, 12px);
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.skeleton {
+  border-radius: var(--r-xs);
+  background: linear-gradient(
+    90deg,
+    var(--bg-subtle) 25%,
+    var(--border-soft) 37%,
+    var(--bg-subtle) 63%
+  );
+  background-size: 400% 100%;
+  animation: pa-shimmer 1.3s ease-in-out infinite;
+}
+
+@keyframes pa-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}

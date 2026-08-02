@@ -1,0 +1,15 @@
+// ===========================================================================
+// AuthWrapper — full-height centring while the session resolves
+// Transcribed from styles/pages/_auth.scss (.auth-loading).
+//
+// NOTE: app/not-found.tsx reuses the same centring. Until that page gets its
+// own module, styles/App.scss keeps a global `.auth-loading` with identical
+// declarations — see STRUCTURE.md.
+// ===========================================================================
+@use "index" as *;
+
+.gate {
+  @include center;
+  min-height: 100vh;
+  min-height: 100dvh;
+}

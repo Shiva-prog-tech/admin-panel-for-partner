@@ -1,0 +1,62 @@
+// ===========================================================================
+// Badge — status pill
+// Transcribed from styles/components/_badges.scss (.badge).
+// ===========================================================================
+@use "index" as *;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 23px;
+  padding: 0 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  background: var(--grey-bg);
+  color: var(--grey-text);
+}
+
+.success {
+  background: var(--green-bg);
+  color: var(--green-text);
+}
+
+.info {
+  background: var(--blue-bg);
+  color: var(--blue-text);
+}
+
+.danger {
+  background: var(--red-bg);
+  color: var(--red-text);
+}
+
+.warning {
+  background: var(--amber-bg);
+  color: var(--amber-text);
+}
+
+.neutral {
+  background: var(--grey-bg);
+  color: var(--grey-text);
+}
+
+.upper {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  height: 21px;
+  padding: 0 8px;
+}
+
+.dot::before {
+  content: "";
+  @include size(6px);
+  border-radius: var(--r-pill);
+  background: currentColor;
+  flex: 0 0 auto;
+}

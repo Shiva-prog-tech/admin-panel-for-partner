@@ -1,0 +1,93 @@
+/* ==========================================================================
+   Table cell helpers — intentionally GLOBAL.
+
+   Every listing module hands these to <DataTable> as `cellClassName` /
+   `headerClassName` strings, or applies them inline on a <span> inside a
+   `render()` callback. They cross the component boundary by design, so they
+   cannot be module-local without inventing a wrapper component per cell type.
+
+   This mirrors the reference project, which co-locates Components/Table/table.css
+   next to its module styles for exactly this reason (convention #7).
+   ========================================================================== */
+
+/* alignment ------------------------------------------------------------- */
+.dt__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.dt__center {
+  text-align: center;
+}
+
+.dt__nowrap {
+  white-space: nowrap;
+}
+
+/* reference id + copy affordance ---------------------------------------- */
+.dt__ref {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.dt__ref-id {
+  color: var(--brand-ink);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+.dt__ref-id:hover {
+  color: var(--brand-strong);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* emphasis -------------------------------------------------------------- */
+.dt__strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.dt__muted {
+  color: var(--text-faint);
+}
+
+.dt__mono {
+  font-family: "SFMono-Regular", "JetBrains Mono", Consolas, "Liberation Mono",
+    monospace;
+  font-size: 12.5px;
+  letter-spacing: -0.01em;
+}
+
+/* issuer rejection copy ------------------------------------------------- */
+.dt__reason {
+  display: block;
+  max-width: 270px;
+  color: var(--red-text);
+  font-size: 12.5px;
+  line-height: 1.35;
+  white-space: normal;
+}
+
+/* trailing action column ----------------------------------------------- */
+.dt__action {
+  width: 60px;
+  text-align: right;
+  padding-right: 18px !important;
+}
+
+.dt__action-inner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* long issuer card references stay on one line but shrink slightly ----- */
+.card-no {
+  font-size: 11.5px;
+  letter-spacing: -0.02em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}

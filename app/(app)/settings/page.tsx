@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Settings from "@/modules/Settings/Settings";
+import Settings from "@/modules/SettingsModule";
 
 export const metadata: Metadata = { title: "Settings" };
 

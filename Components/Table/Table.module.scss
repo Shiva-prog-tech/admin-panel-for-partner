@@ -1,0 +1,144 @@
+// ===========================================================================
+// Table — shell, toolbar, scroll container, head/body, footer
+// Transcribed from styles/components/_table.scss.
+//
+// Only the classes DataTable applies itself live here. The cell helpers that
+// listing modules pass in as `cellClassName` strings (or apply inline on a
+// <span>) stay global in ./table.css — see convention #7 in STRUCTURE.md.
+// ===========================================================================
+@use "index" as *;
+
+.shell {
+  @include card(var(--r-md));
+  overflow: hidden;
+}
+
+// --- toolbar --------------------------------------------------------------
+.toolbar {
+  @include flex(row, space-between, center, 12px);
+  flex-wrap: wrap;
+  padding: 16px 18px;
+}
+
+.toolbarLeft {
+  @include flex(row, flex-start, center, 10px);
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.toolbarRight {
+  @include flex(row, flex-end, center, 10px);
+  flex-wrap: wrap;
+}
+
+// --- scroll container -----------------------------------------------------
+.scroll {
+  @include scroll-x;
+  border-top: 1px solid var(--border);
+}
+
+// --- the table itself -----------------------------------------------------
+.dt {
+  width: 100%;
+  min-width: 900px;
+  font-size: 13px;
+
+  thead th {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-align: left;
+    white-space: nowrap;
+    background: var(--bg-card);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--text-secondary);
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition: background $fast $ease;
+
+    &:hover {
+      background: var(--bg-hover);
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+
+  span {
+    @include flex(row, flex-start, center, 5px);
+  }
+
+  &:hover {
+    color: var(--text-secondary);
+  }
+}
+
+.sort {
+  display: inline-flex;
+  color: var(--text-faint);
+  transition: color $fast $ease;
+}
+
+.sortActive {
+  color: var(--brand-strong);
+}
+
+// --- footer ---------------------------------------------------------------
+.footer {
+  @include flex(row, space-between, center, 14px);
+  flex-wrap: wrap;
+  padding: 13px 18px;
+  border-top: 1px solid var(--border);
+}
+
+.count {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.footerRight {
+  @include flex(row, flex-end, center, 12px);
+  flex-wrap: wrap;
+}
+
+// --- empty state ----------------------------------------------------------
+// DataTable renders this when a filter or search yields nothing. Moved out of
+// styles/App.scss; the 404 has its own copy in app/NotFound.module.scss.
+.empty {
+  @include flex(column, center, center, 10px);
+  padding: 54px 20px;
+  text-align: center;
+}
+
+.emptyIcon {
+  @include soft-circle(52px);
+}
+
+.emptyTitle {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.emptyText {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 320px;
+}

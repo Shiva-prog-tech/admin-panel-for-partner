@@ -1,0 +1,27 @@
+// ===========================================================================
+// DashboardModule — page composition
+// Transcribed from styles/pages/_dashboard.scss and the .dash-row grid in
+// styles/components/_cards.scss.
+// ===========================================================================
+@use "index" as *;
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+}
+
+// float chart + operations health
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.72fr) minmax(0, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+
+  @include upto(lg) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.quick {
+  margin-bottom: 4px;
+}

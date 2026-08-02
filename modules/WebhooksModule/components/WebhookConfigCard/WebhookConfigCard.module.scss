@@ -1,0 +1,41 @@
+// ===========================================================================
+// WebhookConfigCard — endpoint URL + secret actions
+// Transcribed from styles/pages/_listing.scss (.webhook-config).
+// ===========================================================================
+@use "index" as *;
+
+.config {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.field {
+  width: 100%;
+  max-width: 620px;
+}
+
+.actions {
+  @include flex(row, flex-start, center, 10px);
+  flex-wrap: wrap;
+}
+
+.error {
+  color: var(--red-text);
+}
+
+.hint {
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.control {
+  @include field;
+  height: 42px;
+
+  input {
+    @include reset-input;
+  }
+}

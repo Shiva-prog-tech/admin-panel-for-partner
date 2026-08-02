@@ -1,0 +1,75 @@
+// ===========================================================================
+// TextField — label + bordered control with an optional leading glyph.
+//
+// Transcribed from styles/components/_forms.scss (.field) plus the auth-screen
+// overrides in styles/pages/_auth.scss. PasswordField imports this same module
+// so the two controls cannot drift apart.
+// ===========================================================================
+@use "index" as *;
+
+.field {
+  display: block;
+}
+
+.label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.control {
+  @include field;
+  height: 48px;
+  border-radius: var(--r-sm);
+
+  input,
+  textarea {
+    @include reset-input;
+  }
+}
+
+/// 42px control used inside modals and toolbars.
+.controlCompact {
+  height: 42px;
+}
+
+.icon {
+  flex: 0 0 auto;
+  color: var(--text-faint);
+}
+
+.reveal {
+  @include center;
+  @include size(26px);
+  flex: 0 0 auto;
+  border-radius: 6px;
+  color: var(--text-faint);
+  transition: color $fast $ease, background $fast $ease;
+
+  &:hover {
+    color: var(--text-secondary);
+    background: var(--bg-hover);
+  }
+}
+
+.hint {
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.hintError {
+  color: var(--red-text);
+}
+
+.error {
+  .control {
+    border-color: var(--red-text);
+
+    &:focus-within {
+      box-shadow: 0 0 0 3px rgba(217, 71, 74, 0.12);
+    }
+  }
+}

@@ -1,0 +1,25 @@
+// ===========================================================================
+// LanguageSelect — locale picker on the auth screens
+// Transcribed from styles/pages/_auth.scss (.lang).
+// Panel chrome comes from Components/Dropdown/Dropdown.module.scss.
+// ===========================================================================
+@use "index" as *;
+
+.trigger {
+  @include flex(row, flex-start, center, 7px);
+  height: 34px;
+  padding: 0 8px;
+  border-radius: var(--r-xs);
+  font-size: 13px;
+  color: var(--text-secondary);
+  transition: background $fast $ease, color $fast $ease;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+}
+
+.caret {
+  color: var(--text-muted);
+}

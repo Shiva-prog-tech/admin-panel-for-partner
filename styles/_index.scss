@@ -1,0 +1,17 @@
+// ===========================================================================
+// Style barrel.
+//
+// Every co-located *.module.scss pulls the shared Sass layer through this one
+// entry point:
+//
+//     @use "index" as *;
+//
+// `next.config.ts` adds styles/ to the Sass load path, so the bare "index"
+// specifier resolves from anywhere in the tree.
+//
+// Each member has exactly one definition site — `mixins` @use-s `variables`
+// rather than redeclaring it, so nothing is ever loaded twice under `as *`.
+// ===========================================================================
+
+@forward "mixins";
+@forward "media";

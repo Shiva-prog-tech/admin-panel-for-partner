@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import SignUp from "@/modules/Auth/SignUp";
+import SignUp from "@/modules/SignUpModule";
 
 export const metadata: Metadata = {
   title: "Create account",

@@ -1,0 +1,50 @@
+// ===========================================================================
+// QuickLinks — six shortcut tiles
+// Transcribed from styles/components/_cards.scss (.quick-links, .quick-link).
+// ===========================================================================
+@use "index" as *;
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+
+  @include upto(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @include upto(xs) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.link {
+  @include flex(column, center, center, 10px);
+  height: 84px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  font-weight: 500;
+  text-align: center;
+  transition: border-color $fast $ease, color $fast $ease, background $fast $ease,
+    transform $fast $ease;
+
+  svg {
+    color: var(--text-secondary);
+    transition: color $fast $ease;
+  }
+
+  &:hover {
+    border-color: var(--border-amber);
+    background: var(--bg-amber-tint);
+    color: var(--brand-ink);
+    transform: translateY(-1px);
+
+    svg {
+      color: var(--brand-strong);
+    }
+  }
+}

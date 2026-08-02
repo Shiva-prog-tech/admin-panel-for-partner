@@ -1,5 +1,5 @@
-import AuthGate from "@/Components/AuthGate/AuthGate";
-import AppShell from "@/Components/AppShell/AppShell";
+import AuthGate from "@/Components/AuthWrapper";
+import AppShell from "@/Components/DashboardWrapper";
 
 /** Everything behind the session guard renders inside the backoffice chrome. */
 export default function AppGroupLayout({

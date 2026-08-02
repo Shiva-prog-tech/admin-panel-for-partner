@@ -1,0 +1,77 @@
+// ===========================================================================
+// OpsHealthCard — webhook health + custody balances, with the ECG flourish
+// Transcribed from styles/components/_cards.scss (.ops-card, .balance-row,
+// .ok-dot).
+// ===========================================================================
+@use "index" as *;
+
+.ecg {
+  position: absolute;
+  top: 18px;
+  right: 14px;
+  width: 168px;
+  color: var(--amber-400);
+  pointer-events: none;
+  opacity: 0.9;
+
+  @include upto(sm) {
+    display: none;
+  }
+}
+
+.row {
+  @include flex(row, space-between, center, 12px);
+  padding: 9px 0;
+  font-size: 13px;
+}
+
+.rowLabel {
+  @include flex(row, flex-start, center, 7px);
+  color: var(--text-secondary);
+}
+
+.rowValue {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.sectionTitle {
+  margin: 8px 0 2px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.footer {
+  margin-top: 14px;
+}
+
+.okDot {
+  @include center;
+  color: var(--green-solid);
+}
+
+// --- custody balance row --------------------------------------------------
+.balance {
+  @include flex(row, space-between, center, 12px);
+  padding: 7px 0;
+}
+
+.balanceLeft {
+  @include flex(row, flex-start, center, 10px);
+  min-width: 0;
+}
+
+.symbol {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.amount {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

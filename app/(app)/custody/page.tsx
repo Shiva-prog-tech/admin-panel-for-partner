@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Custody from "@/modules/Custody/Custody";
+import Custody from "@/modules/CustodyModule";
 
 export const metadata: Metadata = { title: "Custody" };
 

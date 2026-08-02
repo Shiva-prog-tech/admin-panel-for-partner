@@ -1,0 +1,131 @@
+// ===========================================================================
+// Button — the panel's only button chrome.
+//
+// Transcribed from the .btn block that used to live in styles/App.scss. It was
+// the largest remaining global surface (35 call sites), which is why it needed
+// a component rather than a class string.
+// ===========================================================================
+@use "index" as *;
+
+.btn {
+  @include flex(row, center, center, 8px);
+  height: 42px;
+  padding: 0 16px;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background $fast $ease, border-color $fast $ease, color $fast $ease,
+    box-shadow $fast $ease, transform $fast $ease;
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// filled amber — primary table action ("Add user", "Add cardholder")
+.brand {
+  background: var(--brand-grad);
+  color: var(--text-on-brand);
+  box-shadow: var(--shadow-brand);
+
+  &:hover:not(:disabled) {
+    background: var(--brand-grad-hover);
+  }
+}
+
+// amber outline — "Export"
+.outline {
+  height: 44px;
+  border-color: var(--border-amber);
+  color: var(--brand-ink);
+  background: var(--bg-card);
+
+  &:hover:not(:disabled) {
+    background: var(--bg-amber-tint);
+    border-color: var(--amber-300);
+  }
+}
+
+// neutral outline — "Filters"
+.ghost {
+  border-color: var(--border);
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  font-weight: 500;
+
+  &:hover:not(:disabled) {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+  }
+}
+
+.plain {
+  color: var(--text-secondary);
+  background: transparent;
+  font-weight: 500;
+
+  &:hover:not(:disabled) {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+}
+
+.danger {
+  background: var(--red-text);
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    filter: brightness(0.94);
+  }
+}
+
+.sm {
+  height: 36px;
+  padding: 0 12px;
+  font-size: 12.5px;
+}
+
+.tall {
+  height: 44px;
+  border-radius: 12px;
+}
+
+.block {
+  width: 100%;
+}
+
+// --- inline text actions --------------------------------------------------
+.linkBrand {
+  @include flex(row, flex-start, center, 6px);
+  color: var(--brand-ink);
+  font-size: 13px;
+  font-weight: 600;
+  transition: gap $fast $ease, color $fast $ease;
+
+  &:hover {
+    gap: 9px;
+    color: var(--brand-strong);
+  }
+}
+
+// destructive text action inside a table row
+.linkDanger {
+  color: var(--red-text);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}

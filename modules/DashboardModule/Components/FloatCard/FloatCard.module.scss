@@ -1,0 +1,27 @@
+// ===========================================================================
+// FloatCard — headline balance, ledger link, 7-day area chart
+// Transcribed from styles/components/_cards.scss (.float-card).
+// ===========================================================================
+@use "index" as *;
+
+.value {
+  @include flex(row, flex-start, baseline, 12px);
+  margin-top: 8px;
+}
+
+.amount {
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.link {
+  margin-top: 10px;
+}
+
+.chart {
+  margin-top: 14px;
+}

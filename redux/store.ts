@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "./reducers/authSlice";
-import configReducer from "./reducers/configSlice";
-import filtersReducer from "./reducers/filtersSlice";
-import popupsReducer from "./reducers/popupsSlice";
-import toastReducer from "./reducers/toastSlice";
+import authReducer from "./reducers/AuthReducer";
+import configReducer from "./reducers/ConfigReducer";
+import filtersReducer from "./reducers/FiltersReducer";
+import popupsReducer from "./reducers/PopUpsReducer";
+import toastReducer from "./reducers/ToastReducer";
 
 export const makeStore = () =>
   configureStore({

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
 import "@/styles/App.scss";
 import ReduxProvider from "@/redux/provider";
-import SessionBootstrap from "@/Components/AuthGate/SessionBootstrap";
+import SessionBootstrap from "@/Components/AuthWrapper/SessionBootstrap";
 import { APP_NAME, APP_TAGLINE } from "@/types/constants";
 
 export const metadata: Metadata = {

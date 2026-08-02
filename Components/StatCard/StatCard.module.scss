@@ -1,0 +1,114 @@
+// ===========================================================================
+// StatCard — metric tile
+//
+// Declarations are transcribed verbatim from styles/components/_cards.scss;
+// only the selectors are flattened from BEM to module-local names.
+// ===========================================================================
+@use "index" as *;
+
+.stat {
+  @include card(var(--r-md));
+  padding: 17px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow $normal $ease, border-color $normal $ease;
+
+  &:hover {
+    box-shadow: var(--shadow-sm);
+    border-color: var(--border-strong);
+  }
+}
+
+// dashboard variant: delta row + full-bleed sparkline
+.stacked {
+  padding-bottom: 4px;
+}
+
+// listing variant: caption + inline sparkline on the right
+.inline {
+  padding: 20px 18px;
+  justify-content: center;
+}
+
+.top {
+  @include flex(row, flex-start, center, 13px);
+}
+
+.icon {
+  @include soft-circle(46px);
+}
+
+.meta {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.label {
+  font-size: 13.5px;
+  font-weight: 450;
+  color: var(--text-secondary);
+  @include truncate;
+}
+
+.value {
+  margin-top: 2px;
+  font-size: 27px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+// long composite headlines (e.g. "35.81 USDT · 2.58 TRX · …") need to wrap
+.valueSm {
+  font-size: 20px;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.valueXs {
+  font-size: 16px;
+  letter-spacing: -0.005em;
+  line-height: 1.35;
+}
+
+.caption {
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.delta {
+  @include flex(row, flex-start, center, 5px);
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.deltaUp {
+  strong,
+  svg {
+    color: var(--green-solid);
+  }
+}
+
+.deltaDown {
+  strong,
+  svg {
+    color: var(--red-text);
+  }
+}
+
+.spark {
+  margin-top: 10px;
+}
+
+.sparkInline {
+  flex: 0 0 auto;
+  width: 86px;
+}

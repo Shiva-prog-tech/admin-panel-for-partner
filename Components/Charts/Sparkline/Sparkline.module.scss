@@ -1,0 +1,23 @@
+// ===========================================================================
+// Sparkline — responsive micro-chart
+// Transcribed from styles/components/_charts.scss (.spark).
+// ===========================================================================
+@use "index" as *;
+
+.spark {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.line {
+  fill: none;
+  stroke: var(--chart-line);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.area {
+  stroke: none;
+}

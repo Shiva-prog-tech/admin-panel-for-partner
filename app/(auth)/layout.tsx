@@ -1,4 +1,4 @@
-import ToastHost from "@/Components/Toast/ToastHost";
+import ToastHost from "@/Components/Toast";
 
 /**
  * Auth screens render without the backoffice chrome. ToastHost is mounted here

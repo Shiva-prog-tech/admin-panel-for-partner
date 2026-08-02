@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import AuditLog from "@/modules/AuditLog/AuditLog";
+import AuditLog from "@/modules/AuditLogModule";
 
 export const metadata: Metadata = { title: "Audit log" };
 

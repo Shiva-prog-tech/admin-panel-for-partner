@@ -1,0 +1,90 @@
+// ===========================================================================
+// AreaChart — filled area with axis ticks, dashed cursor and tooltip
+// Transcribed from styles/components/_charts.scss (.area-chart).
+// ===========================================================================
+@use "index" as *;
+
+.chart {
+  position: relative;
+  width: 100%;
+  user-select: none;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.grid {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+
+.line {
+  fill: none;
+  stroke: var(--chart-line);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.yLabel,
+.xLabel {
+  fill: var(--chart-axis);
+  font-size: 11px;
+  font-weight: 450;
+}
+
+.yLabel {
+  text-anchor: end;
+  dominant-baseline: middle;
+}
+
+.xLabel {
+  text-anchor: middle;
+}
+
+.cursor {
+  stroke: var(--amber-400);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.dot {
+  fill: var(--chart-line);
+  stroke: var(--bg-card);
+  stroke-width: 2.5;
+}
+
+.hit {
+  fill: transparent;
+  cursor: crosshair;
+}
+
+.tip {
+  position: absolute;
+  z-index: 4;
+  transform: translate(-50%, -100%);
+  padding: 7px 10px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.tipValue {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.tipLabel {
+  margin-top: 1px;
+  font-size: 11px;
+  color: var(--text-muted);
+}

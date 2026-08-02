@@ -1,0 +1,16 @@
+// ===========================================================================
+// FloatModule — the three wide summary tiles
+// Transcribed from styles/pages/_listing.scss (.float-tiles).
+// ===========================================================================
+@use "index" as *;
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+
+  @include upto(lg) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

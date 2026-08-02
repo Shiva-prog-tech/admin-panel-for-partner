@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Dashboard from "@/modules/Dashboard/Dashboard";
+import Dashboard from "@/modules/DashboardModule";
 
 export const metadata: Metadata = { title: "Dashboard" };
 

@@ -1,0 +1,45 @@
+// ===========================================================================
+// ListingPage — the scaffolding every record-listing screen shares.
+//
+// Transcribed from the .listing and .stat-grid blocks in styles/App.scss. One
+// sheet imported by 11 modules, rather than 11 near-identical copies.
+// ===========================================================================
+@use "index" as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+}
+
+// the 4-up metric row above the table
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+
+  @include upto(xl) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include upto(xs) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+// three wide tiles instead of four (Float ledger)
+.statsWide {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  @include upto(lg) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+// footnote under a table, e.g. "Balances refresh every 60 seconds"
+.note {
+  @include flex(row, flex-start, center, 8px);
+  margin-top: 14px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}

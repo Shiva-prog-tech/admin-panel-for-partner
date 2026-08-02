@@ -1,0 +1,131 @@
+// ===========================================================================
+// Dropdown — the popover primitive shared by FilterMenu, RowMenu, NavBar,
+// LanguageSelect and DateRangePicker.
+//
+// Transcribed from styles/components/_forms.scss (.popover, .menu-item,
+// .check-row). Consumers import this module directly rather than each
+// redeclaring the same panel chrome.
+// ===========================================================================
+@use "index" as *;
+
+.root {
+  position: relative;
+  display: inline-flex;
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: $z-dropdown;
+  min-width: 210px;
+  padding: 7px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-md);
+  @include fade-in;
+}
+
+.panelLeft {
+  right: auto;
+  left: 0;
+}
+
+.panelWide {
+  min-width: 258px;
+}
+
+.title {
+  padding: 6px 10px 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.divider {
+  height: 1px;
+  margin: 6px 0;
+  background: var(--border);
+}
+
+// --- menu item ------------------------------------------------------------
+.item {
+  @include flex(row, flex-start, center, 9px);
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--r-xs);
+  font-size: 13px;
+  font-weight: 450;
+  color: var(--text-secondary);
+  text-align: left;
+  transition: background $fast $ease, color $fast $ease;
+
+  svg {
+    flex: 0 0 auto;
+    color: var(--text-muted);
+  }
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+
+    svg {
+      color: var(--text-secondary);
+    }
+  }
+}
+
+.itemDanger {
+  color: var(--red-text);
+
+  svg {
+    color: var(--red-text);
+  }
+
+  &:hover {
+    background: var(--red-bg);
+    color: var(--red-text);
+  }
+}
+
+.itemCheck {
+  margin-left: auto;
+  color: var(--brand-strong);
+}
+
+// --- checkable row --------------------------------------------------------
+.checkRow {
+  @include flex(row, flex-start, center, 10px);
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--r-xs);
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: left;
+
+  &:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.checkRowOn {
+  color: var(--text-primary);
+
+  .checkBox {
+    background: var(--brand);
+    border-color: var(--brand);
+  }
+}
+
+.checkBox {
+  @include center;
+  @include size(17px);
+  flex: 0 0 auto;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 5px;
+  color: #fff;
+  transition: background $fast $ease, border-color $fast $ease;
+}

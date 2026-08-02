@@ -1,0 +1,94 @@
+// ===========================================================================
+// Popup — overlay + dialog shell
+// Transcribed from styles/components/_overlays.scss (.modal-overlay, .modal).
+// Filename follows the reference convention (lowercase popup.module.scss).
+// ===========================================================================
+@use "index" as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal;
+  @include center;
+  padding: 20px;
+  background: rgba(16, 24, 40, 0.4);
+  backdrop-filter: blur(2px);
+  animation: pa-overlay-in $normal $ease both;
+}
+
+@keyframes pa-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  animation: pa-modal-in $slow $ease both;
+}
+
+@keyframes pa-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.lg {
+  max-width: 620px;
+}
+
+.head {
+  @include flex(row, space-between, flex-start, 14px);
+  padding: 20px 22px 14px;
+}
+
+.title {
+  font-size: 16.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.sub {
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.close {
+  @include icon-btn(32px, var(--r-xs));
+  border-color: transparent;
+  flex: 0 0 auto;
+}
+
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.foot {
+  @include flex(row, flex-end, center, 10px);
+  padding: 14px 22px 20px;
+  border-top: 1px solid var(--border);
+}

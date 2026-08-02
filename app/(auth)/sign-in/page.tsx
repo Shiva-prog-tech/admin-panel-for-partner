@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import SignIn from "@/modules/Auth/SignIn";
+import SignIn from "@/modules/SignInModule";
 
 export const metadata: Metadata = {
   title: "Sign in",

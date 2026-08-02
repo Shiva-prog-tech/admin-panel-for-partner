@@ -43,6 +43,15 @@ const http: AxiosInstance = axios.create({
 });
 
 http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  // The backend is external; without a base URL every request would silently
+  // resolve against this app's own origin and 404. Fail loudly in development.
+  if (!Config.api.baseUrl && process.env.NODE_ENV !== "production") {
+    throw new Error(
+      "NEXT_PUBLIC_API_BASE_URL is not set. This app does not host an API — " +
+        "point it at your backend in .env.development."
+    );
+  }
+
   const token = getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

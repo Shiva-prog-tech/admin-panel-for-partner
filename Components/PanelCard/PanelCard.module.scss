@@ -1,0 +1,50 @@
+// ===========================================================================
+// PanelCard — the bordered section shell every module builds on.
+//
+// Transcribed from the .panel-card block in styles/App.scss (15 call sites).
+// ===========================================================================
+@use "index" as *;
+
+.card {
+  @include card(var(--r-md));
+  position: relative;
+  padding: 20px 22px 22px;
+  overflow: hidden;
+}
+
+.flush {
+  padding: 0;
+}
+
+.head {
+  @include flex(row, space-between, center, 12px);
+  padding-bottom: 14px;
+}
+
+// a rule under the header, used when the body is a list rather than a chart
+.divided .head {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+
+.title {
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.sub {
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+// heading above a secondary table on a multi-section page
+.sectionTitle {
+  margin: 4px 0 10px;
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}

@@ -1,0 +1,21 @@
+// ===========================================================================
+// AuditLogModule — HTTP verb chip in the machine-request table
+// Transcribed from styles/components/_badges.scss (.method-tag).
+// ===========================================================================
+@use "index" as *;
+
+.method {
+  @include center;
+  display: inline-flex;
+  min-width: 52px;
+  height: 21px;
+  padding: 0 7px;
+  border-radius: 5px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: "SFMono-Regular", "JetBrains Mono", Consolas, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}

@@ -1,0 +1,18 @@
+// ===========================================================================
+// EcgLine — ornamental heartbeat trace
+// Transcribed from styles/components/_charts.scss (.ecg).
+// ===========================================================================
+@use "index" as *;
+
+.ecg {
+  display: block;
+  width: 100%;
+}
+
+.line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}

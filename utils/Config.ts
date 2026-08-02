@@ -22,7 +22,13 @@ export const Config = {
   appTagline: env("NEXT_PUBLIC_APP_TAGLINE", "Swipeo tenant backoffice"),
 
   api: {
-    baseUrl: env("NEXT_PUBLIC_API_BASE_URL", "/api"),
+    /**
+     * The backend is a separate service — this app never hosts one. There is no
+     * fallback on purpose: a missing value should surface immediately rather
+     * than silently resolving to a Next.js route that does not exist.
+     * Set in .env.development / .env.production.
+     */
+    baseUrl: env("NEXT_PUBLIC_API_BASE_URL", ""),
     timeout: Number(env("NEXT_PUBLIC_API_TIMEOUT", "30000")),
   },
 

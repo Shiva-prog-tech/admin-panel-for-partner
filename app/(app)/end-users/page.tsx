@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import EndUsers from "@/modules/EndUsers/EndUsers";
+import EndUsers from "@/modules/EndUsersModule";
 
 export const metadata: Metadata = { title: "End users" };
 

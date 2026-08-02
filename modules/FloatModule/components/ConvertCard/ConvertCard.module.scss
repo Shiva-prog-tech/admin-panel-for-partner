@@ -1,0 +1,60 @@
+// ===========================================================================
+// ConvertCard — "Convert custody → USD float"
+// Transcribed from styles/pages/_dashboard.scss (.convert-card).
+// ===========================================================================
+@use "index" as *;
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+
+  @include upto(md) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.actions {
+  @include flex(row, flex-start, center, 10px);
+  margin-top: 18px;
+}
+
+.quote {
+  margin-top: 16px;
+  padding: 4px 16px;
+  border: 1px solid var(--border-amber);
+  border-radius: var(--r-md);
+  background: var(--bg-amber-tint);
+  @include fade-in;
+}
+
+.credited {
+  color: var(--green-text);
+}
+
+
+// --- quote breakdown ------------------------------------------------------
+// Transcribed from styles/components/_cards.scss (.kv-list). ConvertCard is the
+// only consumer, so it moves here rather than staying in the global layer.
+.kvRow {
+  @include flex(row, space-between, center, 14px);
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 13px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.kvKey {
+  color: var(--text-muted);
+}
+
+.kvVal {
+  color: var(--text-primary);
+  font-weight: 500;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+

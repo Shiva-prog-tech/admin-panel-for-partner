@@ -1,0 +1,18 @@
+// ===========================================================================
+// NameAvatar — round illustrated portrait
+//
+// Sizing stays inline (it is driven by the `size` prop), so this module only
+// carries the static chrome that was previously expressed as inline styles.
+// ===========================================================================
+@use "index" as *;
+
+.avatar {
+  display: inline-flex;
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.ring {
+  box-shadow: 0 0 0 2px var(--bg-panel), 0 0 0 3px var(--border);
+}

@@ -1,0 +1,189 @@
+// ===========================================================================
+// NavBar — tenant identity, omnisearch, notifications, env switch, profile
+// Transcribed from styles/components/_shell.scss (.topbar, .live-pill,
+// .omnisearch, .tb-btn, .env-select, .profile-chip).
+// ===========================================================================
+@use "index" as *;
+
+.topbar {
+  @include flex(row, space-between, center, 20px);
+  flex: 0 0 auto;
+  height: $topbar-h;
+  padding: 0 22px;
+  border-bottom: 1px solid var(--border);
+
+  @include upto(sm) {
+    height: 72px;
+    padding: 0 14px;
+  }
+}
+
+.left {
+  @include flex(row, flex-start, center, 10px);
+  min-width: 0;
+}
+
+.burger {
+  @include icon-btn(38px, var(--r-sm));
+  display: none;
+
+  @include upto(lg) {
+    display: inline-flex;
+  }
+}
+
+.tenant {
+  @include flex(row, flex-start, center, 9px);
+}
+
+.tenantName {
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  @include truncate;
+}
+
+.tenantMail {
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  @include truncate;
+}
+
+.center {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+
+  @include upto(md) {
+    display: none;
+  }
+}
+
+.right {
+  @include flex(row, flex-end, center, 10px);
+  flex: 0 0 auto;
+}
+
+// --- live / sandbox pill --------------------------------------------------
+.livePill {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: var(--r-pill);
+  background: var(--bg-amber-soft);
+  color: var(--brand-ink);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+// --- omnisearch trigger --------------------------------------------------
+.omnisearch {
+  @include flex(row, flex-start, center, 10px);
+  width: 100%;
+  max-width: 430px;
+  height: 44px;
+  padding: 0 12px 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-input);
+  color: var(--text-faint);
+  font-size: 13.5px;
+  transition: border-color $fast $ease, box-shadow $fast $ease;
+
+  &:hover {
+    border-color: var(--border-strong);
+  }
+}
+
+.omnisearchLabel {
+  flex: 1 1 auto;
+  text-align: left;
+}
+
+.kbd {
+  @include center;
+  height: 22px;
+  padding: 0 7px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+// --- icon buttons --------------------------------------------------------
+.tbBtn {
+  @include icon-btn(44px, 12px);
+
+  @include upto(sm) {
+    @include size(38px);
+  }
+}
+
+.tbBtnOpen {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  @include center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: var(--r-pill);
+  border: 2px solid var(--bg-panel);
+  background: var(--brand-grad);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+// --- environment switcher ------------------------------------------------
+.envSelect {
+  select {
+    height: 44px;
+    border-radius: 12px;
+    padding-right: 34px;
+    font-weight: 600;
+    color: var(--brand-ink);
+    border-color: var(--border-amber);
+    background: var(--bg-amber-tint);
+  }
+
+  @include upto(sm) {
+    display: none;
+  }
+}
+
+// --- profile chip --------------------------------------------------------
+.profileChip {
+  @include flex(row, flex-start, center, 7px);
+  height: 46px;
+  padding: 3px 8px 3px 3px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  transition: border-color $fast $ease, background $fast $ease;
+
+  &:hover {
+    border-color: var(--border-strong);
+    background: var(--bg-hover);
+  }
+}
+
+.profileCaret {
+  color: var(--text-muted);
+}
+

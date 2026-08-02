@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ApiKeys from "@/modules/ApiKeys/ApiKeys";
+import ApiKeys from "@/modules/ApiKeysModule";
 
 export const metadata: Metadata = { title: "API keys" };
 

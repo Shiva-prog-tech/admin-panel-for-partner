@@ -6,7 +6,10 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "check:css": "node scripts/check-module-classes.mjs",
+    "verify": "npm run typecheck && npm run check:css && npm run lint"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.1",
@@ -16,12 +19,22 @@
     "react-dom": "19.0.0",
     "react-redux": "^9.2.0"
   },
+  "browserslist": [
+    "chrome 64",
+    "edge 79",
+    "firefox 67",
+    "opera 51",
+    "safari 12"
+  ],
   "devDependencies": {
     "@types/node": "^22.10.7",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "eslint": "^9.18.0",
     "eslint-config-next": "15.1.6",
+    "postcss": "^8.5.25",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-preset-env": "^11.3.2",
     "sass": "^1.83.4",
     "typescript": "^5.7.3"
   }

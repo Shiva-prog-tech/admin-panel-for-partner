@@ -1,0 +1,58 @@
+// ===========================================================================
+// PageHeader — title, breadcrumb trail, right-hand actions
+// Transcribed from styles/components/_shell.scss (.page-head, .crumbs).
+// ===========================================================================
+@use "index" as *;
+
+.head {
+  @include flex(row, space-between, flex-start, 16px);
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+
+  @include upto(sm) {
+    font-size: 22px;
+  }
+}
+
+.sub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.actions {
+  @include flex(row, flex-end, center, 12px);
+  flex-wrap: wrap;
+}
+
+// --- breadcrumbs ----------------------------------------------------------
+.crumbs {
+  @include flex(row, flex-start, center, 7px);
+  margin-top: 5px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.crumb {
+  @include flex(row, flex-start, center, 7px);
+}
+
+.sep {
+  color: var(--text-faint);
+  display: inline-flex;
+}
+
+.link:hover {
+  color: var(--brand-ink);
+}
+
+.current {
+  color: var(--text-secondary);
+}

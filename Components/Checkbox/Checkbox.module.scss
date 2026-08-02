@@ -1,0 +1,56 @@
+// ===========================================================================
+// Checkbox — native input kept in the a11y tree, visually replaced
+// Transcribed from styles/pages/_auth.scss (.cbx).
+// ===========================================================================
+@use "index" as *;
+
+.cbx {
+  position: relative;
+}
+
+.input {
+  position: absolute;
+  opacity: 0;
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  cursor: pointer;
+
+  &:checked + .label .box {
+    background: var(--brand);
+    border-color: var(--brand);
+  }
+
+  &:focus-visible + .label .box {
+    outline: 2px solid var(--amber-400);
+    outline-offset: 2px;
+  }
+}
+
+.label {
+  @include flex(row, flex-start, flex-start, 9px);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.box {
+  @include center;
+  @include size(17px);
+  flex: 0 0 auto;
+  margin-top: 1px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 5px;
+  background: var(--bg-card);
+  color: #fff;
+  transition: background $fast $ease, border-color $fast $ease;
+}
+
+.text {
+  min-width: 0;
+}
+
+.error .box {
+  border-color: var(--red-text);
+}

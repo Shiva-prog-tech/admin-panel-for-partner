@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Cardholders from "@/modules/Cardholders/Cardholders";
+import Cardholders from "@/modules/CardholdersModule";
 
 export const metadata: Metadata = { title: "Cardholders" };
 

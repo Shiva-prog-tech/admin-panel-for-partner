@@ -1,0 +1,72 @@
+// ===========================================================================
+// DateRangePicker — header range control + preset list
+// Transcribed from styles/components/_forms.scss (.range-picker).
+// ===========================================================================
+@use "index" as *;
+
+.picker {
+  position: relative;
+}
+
+.trigger {
+  @include flex(row, flex-start, center, 10px);
+  height: 44px;
+  padding: 0 12px 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 450;
+  white-space: nowrap;
+  transition: border-color $fast $ease, background $fast $ease;
+
+  &:hover {
+    border-color: var(--border-strong);
+    background: var(--bg-hover);
+  }
+}
+
+.icon {
+  color: var(--text-secondary);
+}
+
+.caret {
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+
+.pop {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: $z-dropdown;
+  width: 264px;
+  padding: 8px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-md);
+  @include fade-in;
+}
+
+.opt {
+  @include flex(row, space-between, center, 10px);
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: var(--r-xs);
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: left;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+}
+
+.optActive {
+  background: var(--bg-amber-tint);
+  color: var(--brand-ink);
+  font-weight: 600;
+}

@@ -1,0 +1,24 @@
+// ===========================================================================
+// RowMenu — the trailing "…" cell trigger
+// Transcribed from styles/components/_buttons.scss (.icon-action).
+// The panel chrome itself comes from Components/Dropdown/Dropdown.module.scss.
+// ===========================================================================
+@use "index" as *;
+
+.trigger {
+  @include center;
+  @include size(28px);
+  border-radius: var(--r-xs);
+  color: var(--text-muted);
+  transition: background $fast $ease, color $fast $ease;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+}
+
+.open {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}

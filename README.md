@@ -14,9 +14,9 @@ seeded datasets that reproduce the reference screens row for row (103 end users,
 | Framework    | Next.js 15 (App Router) + React 19 + TypeScript    |
 | Styling      | SCSS (`styles/App.scss`) over CSS custom properties |
 | State        | Redux Toolkit (`redux/`)                            |
-| Data access  | axios instance + per-resource services             |
+| Data access  | axios instance + per-resource services (external API) |
 | Charts       | Hand-rolled SVG (`Components/Charts`) — no chart lib |
-| Icons        | Single inline stroked set (`Components/Icons/Icon.tsx`) |
+| Icons        | Single inline stroked set (`Components/Icons`)      |
 
 No runtime asset dependencies: the logo, avatar, sparklines, area chart and
 sidebar line-art are all inline SVG, so the panel renders identically offline.
@@ -29,42 +29,119 @@ cp .env.development .env   # optional: the defaults already work
 npm run dev                # http://localhost:3000
 ```
 
-Other scripts: `npm run build`, `npm start`, `npm run lint`, `npx tsc --noEmit`.
+Other scripts: `npm run build`, `npm start`, `npm run lint`, `npm run typecheck`.
+
+```bash
+npm run verify   # typecheck + check:css + lint — run this before committing
+```
+
+`npm run check:css` is the guard that matters during styling work: a mistyped
+CSS Module key resolves to `undefined`, so React drops the attribute and the
+element renders unstyled with a green `tsc`, `eslint` **and** `next build`. The
+guard resolves every `styles.*` reference against the sheet that defines it, and
+`--unused` lists rules nothing references. It caught four such defects during the
+CSS Modules migration.
 
 ## Structure
 
+Every component is a directory entered through `index.tsx`, with its styles
+co-located as a CSS Module beside it. See [STRUCTURE.md](STRUCTURE.md) for the
+conventions and the reasoning behind what stays global.
+
 ```
-app/                     # App Router — routes + API handlers
-├── api/{auth,dashboard,end-users,cardholders,custody}/route.ts
-├── end-users/, cardholders/, cards/, transactions/, card-orders/,
-│   float/, custody/, crypto-txs/, webhooks/, api-keys/,
-│   audit-log/, settings/        (each: page.tsx)
-├── layout.tsx, page.tsx, loading.tsx, not-found.tsx, icon.svg
-Components/              # Shared UI
-├── AppShell/, Sidebar/, Topbar/, PageHeader/, DateRangePicker/
-├── Table/               # DataTable, TableCard, SearchField, FilterMenu,
-│                        #   RowMenu, RefCell, PerPageSelect, ExportButton
-├── Charts/              # Sparkline, AreaChart, EcgLine, chartMath
-├── StatCard/, Badge/, Pagination/, PopUps/, Toast/, Loader/,
-│   Avatar/, Icons/, CommandPalette/
-modules/                 # Page-level feature modules, one per nav item
-├── Dashboard/, EndUsers/, Cardholders/, Cards/, Transactions/,
-│   CardOrders/, Float/, Custody/, CryptoTxs/, Webhooks/,
-│   ApiKeys/, AuditLog/, Settings/
-customHooks/             # useTableState, useClickOutside, useTheme,
-│                        #   useCopyToClipboard, useDebounce, useHotkey, useMediaQuery
-redux/                   # store.ts, provider.tsx, hooks/, reducers/
-│                        #   (auth, config, filters, popups, toast)
-services/                # auth, partner, records
-libs/firebase.ts         # optional push wiring (lazy, no hard dependency)
-utils/                   # axios, helper, Config, coins, CountryData, mockData/
-types/                   # global.ts, constants.ts
-styles/                  # globals.css, App.scss, _variables, _mixins, _media,
-│                        #   components/*, pages/*
-public/assets/           # svgs, pngs, images
-config                   # next.config.ts, tsconfig.json, eslint.config.mjs,
-                         #   .env.development/.production, Jenkinsfile
+app/                            # App Router
+├── (app)/                      # behind the session guard, inside the chrome
+│   ├── end-users/ cardholders/ cards/ transactions/ card-orders/ float/
+│   │   custody/ crypto-txs/ webhooks/ api-keys/ audit-log/ settings/
+│   └── layout.tsx  page.tsx  loading.tsx
+├── (auth)/                     # no chrome
+│   ├── sign-in/  sign-up/
+│   └── layout.tsx
+└── layout.tsx  not-found.tsx  icon.svg
+                                # no app/api — see "Backend" below
+
+Components/                     # each: index.tsx + <Name>.module.scss
+├── DashboardWrapper/           # the shell
+│   ├── Components/NavBar/      #   top bar
+│   └── Components/SideBar/     #   primary nav
+├── Table/                      # index.tsx (DataTable), Table_V2.tsx (shell),
+│                               #   table.css (global cell helpers)
+├── Charts/{Sparkline,AreaChart,EcgLine}/ + chartMath.ts
+├── Dropdown/                   # popover primitive, 6 consumers
+├── PopupHandler/               # central modal router
+├── AuthWrapper/ AuthShell/ SocialButtons/
+├── TextField/ PasswordField/ Checkbox/ Select/ SearchField/
+├── SelectFilter/ PerPageSelect/ FilterMenu/ RowMenu/ RefCell/ ExportButton/
+├── StatCard/ Badge/ CoinIcon/ Pagination/ DetailGrid/ PageHeader/
+├── Popup/ ConfirmPopup/ Toast/ Loader/ CommandPalette/ DateRangePicker/
+├── LanguageSelect/ Avatar/NameAvatar.tsx
+└── Icons/ Illustrations/       # inline SVG, no image assets
+
+modules/                        # each: index.tsx + <Name>Module.module.scss
+├── DashboardModule/Components/{FloatCard,OpsHealthCard,QuickLinks}/
+├── EndUsersModule/components/AddEndUserModal/
+├── CardholdersModule/components/AddCardholderModal/
+├── FloatModule/components/ConvertCard/
+├── WebhooksModule/components/WebhookConfigCard/
+├── CardsModule/ TransactionModule/ CardOrdersModule/ CustodyModule/
+│   CryptoTxsModule/ ApiKeysModule/ AuditLogModule/ SettingsModule/
+├── SignInModule/ SignUpModule/
+└── notificationdropdown/ ProfileDropdownModule/   # NavBar panels
+
+customHooks/     useTableState, useClickOutside, useTheme, useSignOut,
+                 useCopyToClipboard, useDebounce, useHotkey, useMediaQuery
+redux/           store.ts, provider.tsx, hooks/,
+                 reducers/{Auth,Config,Filters,PopUps,Toast}Reducer.ts
+services/        auth.service.ts, tenant.service.ts   # cross-cutting only
+                 list.ts                              # shared paginated fetch
+                 (per-resource services live in modules/*/services/)
+utils/           axios, helper, Config, session, coins, CountryData,
+                 ImageRelativePaths, mockData/
+types/           global.ts, constants.ts
+libs/            firebase.ts   # optional push wiring, no hard dependency
+styles/          _index.scss, App.scss, globals.css, Home.module.css,
+                 media.scss, mixins.scss          # globals only
+public/          assets/{svgs,pngs,images}, terms-and-conditions.html
+scripts/         restructure.sh, check-module-classes.mjs
+config           next.config.ts, postcss.config.mjs, tsconfig.json,
+                 eslint.config.mjs, .env.development/.production, Jenkinsfile
 ```
+
+## Backend
+
+**This app hosts no backend.** There is deliberately no `app/api/` directory —
+the panel is a client for a separate service set by `NEXT_PUBLIC_API_BASE_URL`,
+and every route builds as static (`○`).
+
+A Next.js route handler would only be justified for work that cannot run in the
+browser — a third-party key that must stay server-side, or an httpOnly
+session cookie. Neither applies today, so none exist.
+
+`utils/axios.ts` throws in development if `NEXT_PUBLIC_API_BASE_URL` is unset,
+rather than letting requests silently resolve against this app's own origin.
+
+## Service layer
+
+Two tiers, mirroring the reference:
+
+- **`services/`** holds only cross-cutting domains — `auth.service.ts` (sign
+  in/up/out) and `tenant.service.ts` (read by NavBar, Float and Settings). Named
+  `<domain>.service.ts`.
+- **`modules/<X>/services/<x>Service.ts`** holds each module's own resource
+  access, co-located with its only consumer — the same convention as the
+  reference's `Components/FilmoraPopup/services/airdropService.ts`.
+
+`services/list.ts` is the shared piece both tiers build on: `fetchList()` owns
+the `NEXT_PUBLIC_ENABLE_MOCK_DATA` switch and the `{ rows, total, page,
+pageSize }` contract, so no component ever imports an HTTP client and the flag is
+checked in exactly one place.
+
+> **Wiring status.** `auth.service.ts` is load-bearing — sign in, sign up and
+> sign out all run through it. The resource services are the prepared seam and
+> are **not yet on the live path**: the listing pages still read
+> `utils/mockData/*` directly and paginate client-side through `useTableState`.
+> Moving them over means switching to server-driven pagination, which is a
+> deliberate follow-up rather than a drop-in.
 
 ## Design system
 
@@ -84,9 +161,11 @@ background `#f2f2f3`, panel radius `22px`, card radius `14px`, status badges at
 PRNG and every date is formatted without `Intl`, so server and client markup
 match byte for byte — no hydration warnings and stable screenshots.
 
-Flip the flag to `false` and point `NEXT_PUBLIC_API_BASE_URL` at the backoffice
-API; `services/records.service.ts` already speaks the paginated contract
-(`{ rows, total, page, pageSize }`) that the route handlers in `app/api` mirror.
+Flip the flag to `false` and point `NEXT_PUBLIC_API_BASE_URL` at your backoffice
+API. `services/list.ts` already speaks the paginated contract
+(`{ rows, total, page, pageSize }`), and each module service is a thin wrapper
+over it — so switching is a config change plus moving the listing pages onto
+their service (see the wiring note above).
 
 ## Interaction notes
 

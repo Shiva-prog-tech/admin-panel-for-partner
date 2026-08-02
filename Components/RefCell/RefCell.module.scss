@@ -1,0 +1,27 @@
+// ===========================================================================
+// RefCell — reference id + inline copy affordance
+// Transcribed from styles/components/_buttons.scss (.copy-btn).
+//
+// The amber id text itself uses the global .dt__ref / .dt__ref-id helpers from
+// Components/Table/table.css, because listing modules also apply them directly
+// inside their own render() callbacks.
+// ===========================================================================
+@use "index" as *;
+
+.copy {
+  @include center;
+  @include size(20px);
+  border-radius: 5px;
+  color: var(--text-faint);
+  transition: background $fast $ease, color $fast $ease;
+  flex: 0 0 auto;
+
+  &:hover {
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+  }
+}
+
+.done {
+  color: var(--green-text);
+}
