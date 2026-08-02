@@ -57,7 +57,7 @@ app/                            # App Router
 ├── (auth)/                     # no chrome
 │   ├── sign-in/  sign-up/
 │   └── layout.tsx
-└── layout.tsx  not-found.tsx  icon.svg
+└── layout.tsx  not-found.tsx  NotFound.module.scss  icon.svg
                                 # no app/api — see "Backend" below
 
 Components/                     # each: index.tsx + <Name>.module.scss
@@ -68,6 +68,8 @@ Components/                     # each: index.tsx + <Name>.module.scss
 │                               #   table.css (global cell helpers)
 ├── Charts/{Sparkline,AreaChart,EcgLine}/ + chartMath.ts
 ├── Dropdown/                   # popover primitive, 6 consumers
+├── Button/ PanelCard/ Tag/     # design-system primitives (were global CSS)
+├── ListingPage/                # listing scaffolding + StatGrid, 12 modules
 ├── PopupHandler/               # central modal router
 ├── AuthWrapper/ AuthShell/ SocialButtons/
 ├── TextField/ PasswordField/ Checkbox/ Select/ SearchField/
@@ -96,11 +98,13 @@ services/        auth.service.ts, tenant.service.ts   # cross-cutting only
                  list.ts                              # shared paginated fetch
                  (per-resource services live in modules/*/services/)
 utils/           axios, helper, Config, session, coins, CountryData,
-                 ImageRelativePaths, mockData/
-types/           global.ts, constants.ts
+                 ImageRelativePaths            # leaf layer, no app imports
+mockData/        seeded fixtures for every resource (dev-only)
+types/           global.ts, constants.ts   # cross-cutting only
+                 (record types live in modules/*/types.ts)
 libs/            firebase.ts   # optional push wiring, no hard dependency
-styles/          _index.scss, App.scss, globals.css, Home.module.css,
-                 media.scss, mixins.scss          # globals only
+styles/          _index.scss, App.scss, globals.css, media.scss, mixins.scss
+                 # App.scss is utilities only (2KB); globals.css holds tokens
 public/          assets/{svgs,pngs,images}, terms-and-conditions.html
 scripts/         restructure.sh, check-module-classes.mjs
 config           next.config.ts, postcss.config.mjs, tsconfig.json,
@@ -142,6 +146,32 @@ checked in exactly one place.
 > `utils/mockData/*` directly and paginate client-side through `useTableState`.
 > Moving them over means switching to server-driven pagination, which is a
 > deliberate follow-up rather than a drop-in.
+
+## Types
+
+Same two-tier split as the services:
+
+- **`types/global.ts`** holds only what crosses module boundaries — `Column`
+  (the `DataTable` contract, 13 importers), `Paginated` (the `fetchList`
+  contract), `Tenant`/`AdminUser`/`Environment`, the chart and tile types
+  (`Delta`, `SeriesPoint`, `MetricTile`), `LedgerDirection` (shared by Float and
+  Crypto txs), `FloatSummary` and `CustodyBalance` (each read by two modules),
+  and the UI vocabulary (`Theme`, `BadgeTone`, `SortDir`, `NavItem`, …).
+- **`modules/<X>/types.ts`** holds that module's own record types — the same
+  convention as the reference's `Components/FilmoraPopup/types.ts`.
+
+A module refers to its own types relatively (`from "../types"`), never by
+absolute path.
+
+> **Fixtures and types.** `mockData/*` depends on `modules/*/types`, which is
+> unavoidable once modules own their record shapes — the fixtures *are* those
+> shapes. It lives at the top level rather than under `utils/` so that `utils/`
+> stays a true leaf layer with no app-specific imports.
+>
+> Splitting the fixtures per module was considered and rejected: `auditLog`
+> needs `endUsers` + `cardholders`, `transactions` needs `cards`, `custody` and
+> `floatLedger` both need `dashboard`, and all 13 share `seed`. That would trade
+> one directional dependency for six sibling module→module imports.
 
 ## Design system
 

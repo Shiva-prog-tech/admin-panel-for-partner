@@ -16,10 +16,11 @@ import {
   DIRECTION_OPTIONS,
   JOURNAL_REASON_OPTIONS,
 } from "@/types/constants";
-import type { Column, JournalEntry } from "@/types/global";
-import { floatSummary } from "@/utils/mockData/dashboard";
-import { journalEntries, floatStats } from "@/utils/mockData/floatLedger";
-import { custodySummaryLine } from "@/utils/mockData/custody";
+import type { Column } from "@/types/global";
+import type { JournalEntry } from "./types";
+import { floatSummary } from "@/mockData/dashboard";
+import { journalEntries, floatStats } from "@/mockData/floatLedger";
+import { custodySummaryLine } from "@/mockData/custody";
 import { panelStyles } from "@/Components/PanelCard";
 import { listingStyles } from "@/Components/ListingPage";
 import styles from "./FloatModule.module.scss";

@@ -8,7 +8,7 @@ import FloatCard from "./Components/FloatCard";
 import OpsHealthCard from "./Components/OpsHealthCard";
 import QuickLinks from "./Components/QuickLinks";
 import { useAppSelector } from "@/redux/hooks";
-import { dashboardData } from "@/utils/mockData/dashboard";
+import { dashboardData } from "@/mockData/dashboard";
 import { listingStyles } from "@/Components/ListingPage";
 import styles from "./DashboardModule.module.scss";
 

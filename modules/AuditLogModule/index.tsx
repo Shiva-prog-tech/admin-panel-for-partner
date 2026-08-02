@@ -11,13 +11,14 @@ import Icon from "@/Components/Icons";
 import useTableState from "@/customHooks/useTableState";
 import { API_STATUS_OPTIONS } from "@/types/constants";
 import styles from "./AuditLogModule.module.scss";
-import type { ApiRequestLog, AuditEvent, Column } from "@/types/global";
+import type { Column } from "@/types/global";
+import type { ApiRequestLog, AuditEvent } from "./types";
 import {
   apiRequests,
   apiRequestStats,
   matchesStatusBucket,
-} from "@/utils/mockData/apiAuditLog";
-import { auditEvents, auditStats } from "@/utils/mockData/auditLog";
+} from "@/mockData/apiAuditLog";
+import { auditEvents, auditStats } from "@/mockData/auditLog";
 import { panelStyles } from "@/Components/PanelCard";
 import { listingStyles } from "@/Components/ListingPage";
 import {

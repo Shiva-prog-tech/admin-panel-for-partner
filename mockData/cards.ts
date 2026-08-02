@@ -4,7 +4,7 @@
 // Mirrors the issuer payload: a long "card no" reference is always present,
 // while the masked PAN and last-4 only exist once the card is personalised.
 // ===========================================================================
-import type { Card, CardStatus } from "@/types/global";
+import type { Card, CardStatus } from "@/modules/CardsModule/types";
 import { smoothSeries } from "@/utils/helper";
 import { CARD_PRODUCTS } from "@/types/constants";
 import { descendingStamps, hashSeed, pick, refIds, seededRandom, weighted } from "./seed";

@@ -1,7 +1,7 @@
 // ===========================================================================
 // Physical card orders dataset
 // ===========================================================================
-import type { CardOrder, CardOrderStatus } from "@/types/global";
+import type { CardOrder, CardOrderStatus } from "@/modules/CardOrdersModule/types";
 import { smoothSeries } from "@/utils/helper";
 import { COUNTRIES } from "@/utils/CountryData";
 import { cardholders } from "./cardholders";

@@ -6,8 +6,9 @@
 // services (auth, tenant) stay in the global services/ folder.
 // ===========================================================================
 import { fetchList, exportUrl, type ListQuery } from "@/services/list";
-import { cryptoTxs } from "@/utils/mockData/cryptoTxs";
-import type { CryptoTx, Paginated } from "@/types/global";
+import { cryptoTxs } from "@/mockData/cryptoTxs";
+import type { Paginated } from "@/types/global";
+import type { CryptoTx } from "../types";
 
 export const cryptoTxsService = {
   list: (query: ListQuery = {}): Promise<Paginated<CryptoTx>> =>

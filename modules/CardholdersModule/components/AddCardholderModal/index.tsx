@@ -5,7 +5,7 @@ import Modal from "@/Components/Popup/Popup";
 import TextField from "@/Components/TextField";
 import Select from "@/Components/Select";
 import Icon from "@/Components/Icons";
-import type { Cardholder } from "@/types/global";
+import type { Cardholder } from "../../types";
 import { COUNTRIES } from "@/utils/CountryData";
 import { buttonStyles } from "@/Components/Button";
 import { cx } from "@/utils/helper";

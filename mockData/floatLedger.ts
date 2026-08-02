@@ -4,7 +4,8 @@
 // Crypto settlements arrive as a credit immediately followed by the card
 // top-up debit, so the pairs below intentionally share a timestamp.
 // ===========================================================================
-import type { JournalEntry, JournalReason, LedgerDirection } from "@/types/global";
+import type { LedgerDirection } from "@/types/global";
+import type { JournalEntry, JournalReason } from "@/modules/FloatModule/types";
 import { floatSummary } from "./dashboard";
 import { descendingStamps, hashSeed, pick, seededRandom, weighted } from "./seed";
 

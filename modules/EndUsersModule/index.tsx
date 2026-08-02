@@ -18,8 +18,9 @@ import { clearFilters, selectStatuses, toggleStatus } from "@/redux/reducers/Fil
 import { openPopup } from "@/redux/reducers/PopUpsReducer";
 import { pushToast } from "@/redux/reducers/ToastReducer";
 import { END_USER_STATUSES } from "@/types/constants";
-import type { Column, EndUser } from "@/types/global";
-import { endUsers as seededUsers, endUserStats } from "@/utils/mockData/endUsers";
+import type { Column } from "@/types/global";
+import type { EndUser } from "./types";
+import { endUsers as seededUsers, endUserStats } from "@/mockData/endUsers";
 import { cx, formatDateTimeNumeric, formatNumber } from "@/utils/helper";
 import { buttonStyles } from "@/Components/Button";
 import { listingStyles } from "@/Components/ListingPage";

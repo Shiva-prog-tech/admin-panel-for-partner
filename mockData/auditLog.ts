@@ -1,7 +1,7 @@
 // ===========================================================================
 // Audit log dataset
 // ===========================================================================
-import type { AuditEvent } from "@/types/global";
+import type { AuditEvent } from "@/modules/AuditLogModule/types";
 import { descendingStamps, hashSeed, pick, seededRandom } from "./seed";
 import { endUsers } from "./endUsers";
 import { cardholders } from "./cardholders";

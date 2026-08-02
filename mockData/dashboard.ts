@@ -1,11 +1,7 @@
 // ===========================================================================
 // Dashboard dataset — the exact figures shown in the product spec
 // ===========================================================================
-import type {
-  CustodyBalance,
-  FloatSummary,
-  MetricTile,
-} from "@/types/global";
+import type { CustodyBalance, FloatSummary, MetricTile } from "@/types/global";
 import { jaggedSeries } from "@/utils/helper";
 
 export const dashboardTiles: MetricTile[] = [

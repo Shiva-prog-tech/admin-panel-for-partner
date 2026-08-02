@@ -1,7 +1,7 @@
 // ===========================================================================
 // Webhook endpoints dataset
 // ===========================================================================
-import type { WebhookEndpoint, WebhookState } from "@/types/global";
+import type { WebhookEndpoint, WebhookState } from "@/modules/WebhooksModule/types";
 import { smoothSeries } from "@/utils/helper";
 import { descendingStamps } from "./seed";
 

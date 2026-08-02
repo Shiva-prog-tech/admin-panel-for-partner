@@ -1,7 +1,7 @@
 // ===========================================================================
 // API keys dataset
 // ===========================================================================
-import type { ApiKey } from "@/types/global";
+import type { ApiKey } from "@/modules/ApiKeysModule/types";
 
 export const apiKeys: ApiKey[] = [
   {

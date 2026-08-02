@@ -6,10 +6,11 @@
 // exact code, so it is translated here instead of in the component.
 // ===========================================================================
 import { fetchList, exportUrl, type ListQuery } from "@/services/list";
-import { apiRequests, matchesStatusBucket } from "@/utils/mockData/apiAuditLog";
-import { auditEvents } from "@/utils/mockData/auditLog";
+import { apiRequests, matchesStatusBucket } from "@/mockData/apiAuditLog";
+import { auditEvents } from "@/mockData/auditLog";
 import { Config } from "@/utils/Config";
-import type { ApiRequestLog, AuditEvent, Paginated } from "@/types/global";
+import type { Paginated } from "@/types/global";
+import type { ApiRequestLog, AuditEvent } from "../types";
 
 export interface ApiRequestQuery extends ListQuery {
   /** "" | "2xx" | "400" | "401" | "500" */

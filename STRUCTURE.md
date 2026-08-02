@@ -1,9 +1,12 @@
 # File structure — TRAVLS-CRYPTO-DASHBOARD conventions
 
-> **Status: complete.** All three phases have been applied and verified —
-> `tsc` clean, `lint` clean, clean production build (17 static routes, zero server endpoints), 289 CSS Module
-> references resolving across 38 stylesheets with zero unused selectors, 61/61
-> runtime assertions passing and all 15 pages returning 200.
+> **Status: complete.** Verified — `tsc` clean, `lint` clean, clean production
+> build (**17 static routes, zero server endpoints**), **322 CSS Module
+> references across 43 stylesheets** all resolving, 61/61 runtime assertions
+> passing, all 15 pages returning 200 and the 404 returning 404.
+>
+> `styles/App.scss` is down to **2.0KB of utilities**; `types/global.ts` from
+> ~450 to **144 lines**.
 >
 > What remains below is the record of *why* each decision was made. The one
 > thing never verified is pixel fidelity — there was no browser in the
@@ -17,8 +20,8 @@ one maps onto the Partner Admin Panel's feature set.
 | # | Convention (reference) | Applied here |
 | - | ---------------------- | ------------ |
 | 1 | A component is a **directory** whose entry is `index.tsx` | every `Components/*` gets `index.tsx` |
-| 2 | Styles are **co-located CSS Modules**: `X.module.scss` beside `index.tsx` | ✅ 38 sheets |
-| 3 | `styles/` holds **globals only** — `_index.scss`, `App.scss`, `globals.css`, `Home.module.css`, `media.scss`, `mixins.scss` | ✅ App.scss 7.6KB |
+| 2 | Styles are **co-located CSS Modules**: `X.module.scss` beside `index.tsx` | ✅ 43 sheets, 322 references |
+| 3 | `styles/` holds **globals only** — `_index.scss`, `App.scss`, `globals.css`, `media.scss`, `mixins.scss` | ✅ App.scss **2.0KB**, utilities only |
 | 4 | Nested children live in `Components/` or `components/` under their parent | `DashboardWrapper/Components/{NavBar,SideBar}` |
 | 5 | Page features are `modules/XxxModule/index.tsx` + `XxxModule.module.scss` | ✅ |
 | 6 | Reducers are `redux/reducers/XxxReducer.ts` | ✅ |
@@ -33,6 +36,7 @@ one maps onto the Partner Admin Panel's feature set.
 | 15 | `Components/Dropdown/index.tsx` is a shared popover component | ✅ 6 consumers |
 | 16 | `styles/mixins.scss` + `styles/media.scss` carry no leading underscore | ✅ |
 | 17 | Two-tier services: global `<domain>.service.ts` + co-located `modules/*/services/<x>Service.ts` | ✅ 2 global + 12 module |
+| 18 | Feature types co-locate as `types.ts` (ref: `Components/FilmoraPopup/types.ts`) | ✅ 33 types into 12 `modules/*/types.ts` |
 
 ### `app/api/` — deliberately absent
 
@@ -215,6 +219,48 @@ that owns them:
 Everything else — shell, nav, sidebar, stat tiles, charts, table shell, page
 header, overlays, auth screens and each module's own layout — is a co-located
 module.
+
+### Final de-globalisation pass
+
+`styles/App.scss` ended at **2.0KB — `.u-*` utilities only**. Four components were
+created to absorb what remained, because a class string used at 39 sites is a
+missing component, not a stylesheet concern:
+
+| New component | Absorbed | Call sites |
+| ------------- | -------- | ---------- |
+| `Components/Button` | `.btn` + variants, `.link-brand`, `.link-danger` | 39 |
+| `Components/PanelCard` | `.panel-card` + head/title/sub/divided, `.section-title` | 22 |
+| `Components/ListingPage` | `.listing`, `.stat-grid`, `.float-tiles` (+ `StatGrid`) | 12 modules |
+| `Components/Tag` | `.tag` | 5 |
+
+Three relocations rather than new components: `.empty-state` → `Table.module.scss`
+plus a new `app/NotFound.module.scss`; `.spinner` → exported from `Loader`;
+`.auth-loading` → the 404's own sheet.
+
+`styles/Home.module.css` was **deleted**. It existed only for file-list parity
+with the reference, where it is itself a vestigial leftover, and nothing imported
+it. Copying another project's dead file is not a convention.
+
+Each of these components exports both a component *and* a class map (as
+`Components/Dropdown` does), because many call sites are `<Link>`s, or already
+sit inside a `cx()` with a module class, and cannot be swapped for a `<button>`.
+
+### Fixtures: `mockData/` is top-level, not per-module
+
+Module-owned types mean the fixtures depend on modules. Two ways to arrange that
+were considered:
+
+- **Per-module fixtures** (`modules/CardsModule/mockData.ts`). Rejected — the
+  fixtures are interdependent: `auditLog` needs `endUsers` + `cardholders`,
+  `cardOrders` needs `cardholders`, `transactions` needs `cards`, `custody` and
+  `floatLedger` both need `dashboard`, `settings` needs `webhookDeliveries`, and
+  all 13 share `seed`. That converts one directional dependency into six
+  sibling module→module imports plus a homeless seed helper.
+- **Top-level `mockData/`** (chosen). Keeps the fixtures cohesive and gets them
+  out of `utils/`, which should be — and now is — a leaf layer importing nothing
+  app-specific.
+
+The reference has no fixture layer at all, so there is no convention to copy here.
 
 ### Coverage audit
 

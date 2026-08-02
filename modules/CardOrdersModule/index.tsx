@@ -14,8 +14,9 @@ import useTableState from "@/customHooks/useTableState";
 import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/ToastReducer";
 import { CARD_ORDER_STATUSES } from "@/types/constants";
-import type { CardOrder, Column, SelectOption } from "@/types/global";
-import { cardOrders, cardOrderStats } from "@/utils/mockData/cardOrders";
+import type { Column, SelectOption } from "@/types/global";
+import type { CardOrder } from "./types";
+import { cardOrders, cardOrderStats } from "@/mockData/cardOrders";
 import { formatDateTimeNumeric, formatNumber } from "@/utils/helper";
 import { listingStyles } from "@/Components/ListingPage";
 

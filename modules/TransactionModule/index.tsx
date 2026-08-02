@@ -18,8 +18,9 @@ import {
   TX_STATUS_OPTIONS,
   TX_TYPE_OPTIONS,
 } from "@/types/constants";
-import type { Column, Transaction } from "@/types/global";
-import { transactions, transactionStats } from "@/utils/mockData/transactions";
+import type { Column } from "@/types/global";
+import type { Transaction } from "./types";
+import { transactions, transactionStats } from "@/mockData/transactions";
 import { formatDateTimeNumeric, formatMoney, formatNumber, formatPercent } from "@/utils/helper";
 import { listingStyles } from "@/Components/ListingPage";
 

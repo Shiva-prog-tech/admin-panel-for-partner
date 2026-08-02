@@ -19,8 +19,9 @@ import {
   CRYPTO_REASON_OPTIONS,
   DIRECTION_OPTIONS,
 } from "@/types/constants";
-import type { Column, CryptoTx } from "@/types/global";
-import { cryptoTxs, cryptoStats } from "@/utils/mockData/cryptoTxs";
+import type { Column } from "@/types/global";
+import type { CryptoTx } from "./types";
+import { cryptoTxs, cryptoStats } from "@/mockData/cryptoTxs";
 import { explorerLink } from "@/utils/coins";
 import { formatDateTimeNumeric, formatNumber, truncateMiddle } from "@/utils/helper";
 import { tagStyles } from "@/Components/Tag";

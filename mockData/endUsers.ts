@@ -3,7 +3,7 @@
 // The first page is authored to match the product spec row-for-row; the rest
 // is seeded so pagination, sorting and search all have real data to work on.
 // ===========================================================================
-import type { EndUser, EndUserStatus } from "@/types/global";
+import type { EndUser, EndUserStatus } from "@/modules/EndUsersModule/types";
 import { smoothSeries } from "@/utils/helper";
 import { descendingStamps, hashSeed, refIds, seededRandom, weighted } from "./seed";
 

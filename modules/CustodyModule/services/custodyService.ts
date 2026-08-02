@@ -13,14 +13,9 @@ import {
   custodyWithdrawals,
   feeSchedule,
   poolBalances,
-} from "@/utils/mockData/custody";
-import type {
-  CustodyAssetTile,
-  CustodyWithdrawal,
-  FeeSchedule,
-  Paginated,
-  PoolBalance,
-} from "@/types/global";
+} from "@/mockData/custody";
+import type { Paginated } from "@/types/global";
+import type { CustodyAssetTile, CustodyWithdrawal, FeeSchedule, PoolBalance } from "../types";
 
 export interface CustodyOverview {
   tiles: CustodyAssetTile[];

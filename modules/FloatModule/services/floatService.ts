@@ -7,14 +7,10 @@
 import http from "@/utils/axios";
 import { Config } from "@/utils/Config";
 import { fetchList, exportUrl, type ListQuery } from "@/services/list";
-import { journalEntries } from "@/utils/mockData/floatLedger";
-import { floatSummary } from "@/utils/mockData/dashboard";
-import type {
-  ConvertQuote,
-  FloatSummary,
-  JournalEntry,
-  Paginated,
-} from "@/types/global";
+import { journalEntries } from "@/mockData/floatLedger";
+import { floatSummary } from "@/mockData/dashboard";
+import type { FloatSummary, Paginated } from "@/types/global";
+import type { ConvertQuote, JournalEntry } from "../types";
 
 export interface ConvertRequest {
   asset: string;

@@ -7,7 +7,7 @@
 // ===========================================================================
 import http from "@/utils/axios";
 import { Config } from "@/utils/Config";
-import { dashboardData } from "@/utils/mockData/dashboard";
+import { dashboardData } from "@/mockData/dashboard";
 import type { CustodyBalance, FloatSummary, MetricTile } from "@/types/global";
 
 export interface DashboardPayload {

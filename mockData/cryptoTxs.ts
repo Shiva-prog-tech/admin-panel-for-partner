@@ -4,7 +4,8 @@
 // Tenant pool movements carry the reserved "_pool" reference and no tx hash
 // (they are internal book entries, not on-chain transfers).
 // ===========================================================================
-import type { CryptoReason, CryptoTx, LedgerDirection } from "@/types/global";
+import type { LedgerDirection } from "@/types/global";
+import type { CryptoReason, CryptoTx } from "@/modules/CryptoTxsModule/types";
 import { smoothSeries } from "@/utils/helper";
 import { descendingStamps, hashSeed, pick, refIds, seededRandom, weighted } from "./seed";
 

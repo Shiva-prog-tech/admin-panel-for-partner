@@ -1,7 +1,7 @@
 // ===========================================================================
 // Card transactions dataset — spend and authorisations across all end users
 // ===========================================================================
-import type { Transaction, TxStatus, TxType } from "@/types/global";
+import type { Transaction, TxStatus, TxType } from "@/modules/TransactionModule/types";
 import { smoothSeries, sum } from "@/utils/helper";
 import { cards } from "./cards";
 import { descendingStamps, hashSeed, pick, seededRandom, weighted } from "./seed";

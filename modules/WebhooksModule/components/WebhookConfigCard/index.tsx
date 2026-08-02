@@ -4,7 +4,7 @@ import { useState } from "react";
 import Icon from "@/Components/Icons";
 import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/ToastReducer";
-import { webhookConfig } from "@/utils/mockData/webhookDeliveries";
+import { webhookConfig } from "@/mockData/webhookDeliveries";
 import { cx, formatDateLong } from "@/utils/helper";
 import { buttonStyles } from "@/Components/Button";
 import { panelStyles } from "@/Components/PanelCard";

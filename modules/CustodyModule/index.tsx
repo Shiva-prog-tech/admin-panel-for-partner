@@ -21,7 +21,8 @@ import {
   CUSTODY_ASSET_OPTIONS,
   WITHDRAWAL_STATUS_OPTIONS,
 } from "@/types/constants";
-import type { Column, CustodyWithdrawal, PoolBalance } from "@/types/global";
+import type { Column } from "@/types/global";
+import type { CustodyWithdrawal, PoolBalance } from "./types";
 import { buttonStyles } from "@/Components/Button";
 import { panelStyles } from "@/Components/PanelCard";
 import { tagStyles } from "@/Components/Tag";
@@ -32,7 +33,7 @@ import {
   custodyWithdrawals,
   feeSchedule,
   poolBalances,
-} from "@/utils/mockData/custody";
+} from "@/mockData/custody";
 import { cx,
   formatDateTimeNumeric,
   formatNumber,

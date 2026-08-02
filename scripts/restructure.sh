@@ -1,21 +1,33 @@
 #!/usr/bin/env bash
 # ===========================================================================
-# Phase A + B — align the tree with the TRAVLS-CRYPTO-DASHBOARD conventions.
+# ALREADY APPLIED — kept as the historical record of the restructure.
 #
-#   Phase A  move + rename files      (breaks imports)
-#   Phase B  rewrite import specifiers (restores a green build)
+# This was a one-shot migration: it moved the tree onto the
+# TRAVLS-CRYPTO-DASHBOARD conventions (Phase A) and rewrote every import
+# specifier to match (Phase B). Both have been applied and verified.
 #
-# Both phases run together so the repo is never left uncompilable. Run from
-# the project root:
+# It is NOT runnable any more. Every path it references (Components/AppShell,
+# modules/Dashboard, redux/reducers/authSlice.ts, …) was renamed by this very
+# script, so a second run would abort on the first `mv`. The guard below makes
+# that explicit instead of leaving a script that looks executable.
 #
-#     bash scripts/restructure.sh && npx tsc --noEmit && npm run build
-#
-# Phase C (co-locating styles as *.module.scss) is deliberately NOT here — it
-# edits component bodies, not paths, and must be done with a compiler in the
-# loop. See STRUCTURE.md.
+# Read it to understand what moved where; see STRUCTURE.md for the reasoning.
 # ===========================================================================
 set -euo pipefail
 cd "$(dirname "$0")/.."
+
+if [ ! -f Components/AppShell/AppShell.tsx ]; then
+  cat <<'MSG'
+This migration has already been applied — nothing to do.
+
+  Components/AppShell/AppShell.tsx does not exist, which means the tree is
+  already on the new conventions. Running it again would abort partway through.
+
+  Current layout:  README.md  ("Structure")
+  Why, per rule:   STRUCTURE.md
+MSG
+  exit 0
+fi
 
 say() { printf '\n\033[1m%s\033[0m\n' "$*"; }
 

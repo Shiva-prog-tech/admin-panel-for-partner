@@ -2,7 +2,7 @@
 // Machine API requests — every call your integration makes against the
 // partner API, with the resolved status and server-side latency.
 // ===========================================================================
-import type { ApiRequestLog, HttpMethod } from "@/types/global";
+import type { ApiRequestLog, HttpMethod } from "@/modules/AuditLogModule/types";
 import { descendingStamps, hashSeed, pick, refIds, seededRandom, weighted } from "./seed";
 
 const AUTHORED: Array<Omit<ApiRequestLog, "id">> = [

@@ -1,7 +1,7 @@
 ﻿// ===========================================================================
 // Cardholders dataset â€” 84 records (64 approved / 12 rejected / 8 pending)
 // ===========================================================================
-import type { Cardholder, CardholderStatus } from "@/types/global";
+import type { Cardholder, CardholderStatus } from "@/modules/CardholdersModule/types";
 import { smoothSeries } from "@/utils/helper";
 import { CARD_PRODUCTS, REJECTION_REASONS } from "@/types/constants";
 import { descendingStamps, hashSeed, pick, refIds, seededRandom, weighted } from "./seed";

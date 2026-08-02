@@ -15,12 +15,13 @@ import useTableState from "@/customHooks/useTableState";
 import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/ToastReducer";
 import { DELIVERY_STATUS_OPTIONS } from "@/types/constants";
-import type { Column, WebhookDelivery } from "@/types/global";
+import type { Column } from "@/types/global";
+import type { WebhookDelivery } from "./types";
 import {
   webhookDeliveries,
   deliveryStats,
-} from "@/utils/mockData/webhookDeliveries";
-import { webhookStats } from "@/utils/mockData/webhooks";
+} from "@/mockData/webhookDeliveries";
+import { webhookStats } from "@/mockData/webhooks";
 import { cx, formatDateTimeNumeric, formatNumber } from "@/utils/helper";
 import { buttonStyles } from "@/Components/Button";
 import { panelStyles } from "@/Components/PanelCard";

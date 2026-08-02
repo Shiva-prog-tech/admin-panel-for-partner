@@ -1,7 +1,7 @@
 // ===========================================================================
 // Settings — profile + organization cards
 // ===========================================================================
-import type { OrganizationInfo, ProfileInfo } from "@/types/global";
+import type { OrganizationInfo, ProfileInfo } from "@/modules/SettingsModule/types";
 import { webhookConfig } from "./webhookDeliveries";
 
 export const profileInfo: ProfileInfo = {

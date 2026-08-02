@@ -18,11 +18,12 @@ import { clearFilters, selectStatuses, toggleStatus } from "@/redux/reducers/Fil
 import { openPopup } from "@/redux/reducers/PopUpsReducer";
 import { pushToast } from "@/redux/reducers/ToastReducer";
 import { CARDHOLDER_STATUSES } from "@/types/constants";
-import type { Cardholder, Column } from "@/types/global";
+import type { Column } from "@/types/global";
+import type { Cardholder } from "./types";
 import {
   cardholders as seededCardholders,
   cardholderStats,
-} from "@/utils/mockData/cardholders";
+} from "@/mockData/cardholders";
 import { cx, formatDateTimeLong, formatNumber, share } from "@/utils/helper";
 import { buttonStyles } from "@/Components/Button";
 import { listingStyles } from "@/Components/ListingPage";

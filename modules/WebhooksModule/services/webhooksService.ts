@@ -7,17 +7,13 @@
 import http from "@/utils/axios";
 import { Config } from "@/utils/Config";
 import { fetchList, exportUrl, type ListQuery } from "@/services/list";
-import { webhookEndpoints } from "@/utils/mockData/webhooks";
+import { webhookEndpoints } from "@/mockData/webhooks";
 import {
   webhookConfig,
   webhookDeliveries,
-} from "@/utils/mockData/webhookDeliveries";
-import type {
-  Paginated,
-  WebhookConfig,
-  WebhookDelivery,
-  WebhookEndpoint,
-} from "@/types/global";
+} from "@/mockData/webhookDeliveries";
+import type { Paginated } from "@/types/global";
+import type { WebhookConfig, WebhookDelivery, WebhookEndpoint } from "../types";
 
 export const webhooksService = {
   async config(): Promise<WebhookConfig> {

@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/ToastReducer";
 import { SETTINGS_TABS } from "@/types/constants";
 import { Config } from "@/utils/Config";
-import { organizationInfo, profileInfo } from "@/utils/mockData/settings";
+import { organizationInfo, profileInfo } from "@/mockData/settings";
 import { cx } from "@/utils/helper";
 import { buttonStyles } from "@/Components/Button";
 import { panelStyles } from "@/Components/PanelCard";

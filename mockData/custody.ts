@@ -4,13 +4,7 @@
 // Three views feed the Custody screen: per-asset client balances (the tiles),
 // the tenant pool balance per asset/chain, and the withdrawal queue.
 // ===========================================================================
-import type {
-  CustodyAssetTile,
-  CustodyWithdrawal,
-  FeeSchedule,
-  PoolBalance,
-  WithdrawalStatus,
-} from "@/types/global";
+import type { CustodyAssetTile, CustodyWithdrawal, FeeSchedule, PoolBalance, WithdrawalStatus } from "@/modules/CustodyModule/types";
 import { custodyBalances } from "./dashboard";
 import { descendingStamps, hashSeed, pick, refIds, seededRandom, weighted } from "./seed";
 

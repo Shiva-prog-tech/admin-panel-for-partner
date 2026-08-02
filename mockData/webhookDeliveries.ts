@@ -1,11 +1,7 @@
 // ===========================================================================
 // Webhook configuration + delivery log
 // ===========================================================================
-import type {
-  DeliveryStatus,
-  WebhookConfig,
-  WebhookDelivery,
-} from "@/types/global";
+import type { DeliveryStatus, WebhookConfig, WebhookDelivery } from "@/modules/WebhooksModule/types";
 import { descendingStamps, hashSeed, pick, refIds, seededRandom, weighted } from "./seed";
 
 export const webhookConfig: WebhookConfig = {
