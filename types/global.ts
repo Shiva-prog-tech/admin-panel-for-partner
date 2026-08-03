@@ -18,6 +18,26 @@ export interface SortState {
   dir: SortDir;
 }
 
+/**
+ * The surface `<TableCard>` consumes. Declared here rather than beside a hook
+ * because both the table and `useServerTable` depend on it, and neither owns it.
+ */
+export interface TableState<T> {
+  query: string;
+  setQuery: (value: string) => void;
+  sort: SortState | null;
+  toggleSort: (key: string) => void;
+  page: number;
+  setPage: (page: number) => void;
+  pageSize: number;
+  setPageSize: (size: number) => void;
+  totalPages: number;
+  total: number;
+  rangeFrom: number;
+  rangeTo: number;
+  pageRows: T[];
+}
+
 export interface Column<T> {
   /** unique column id, also used as the sort key */
   key: string;

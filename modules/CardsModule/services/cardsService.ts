@@ -12,7 +12,13 @@ import type { Card } from "../types";
 
 export const cardsService = {
   list: (query: ListQuery = {}): Promise<Paginated<Card>> =>
-    fetchList<Card>("/cards", cards, query),
+    fetchList<Card>("/cards", cards, query, {
+      searchFields: (row) => [row.refId, row.cardNo, row.last4, row.product, row.status],
+      statusOf: (row) => row.status,
+      filterFields: { status: (row) => row.status },
+      sortValue: (row, key) =>
+        (row as unknown as Record<string, string | number | null>)[key] ?? null,
+    }),
 
   exportCsv: (query: ListQuery = {}) => exportUrl("cards", query),
 };

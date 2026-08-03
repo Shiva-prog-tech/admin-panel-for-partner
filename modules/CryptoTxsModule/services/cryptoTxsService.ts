@@ -12,7 +12,19 @@ import type { CryptoTx } from "../types";
 
 export const cryptoTxsService = {
   list: (query: ListQuery = {}): Promise<Paginated<CryptoTx>> =>
-    fetchList<CryptoTx>("/crypto-txs", cryptoTxs, query),
+    fetchList<CryptoTx>("/crypto-txs", cryptoTxs, query, {
+      searchFields: (row) => [row.refId, row.txHash, row.asset, row.chain, row.reason],
+      filterFields: {
+        asset: (row) => row.asset,
+        dir: (row) => row.dir,
+        reason: (row) => row.reason,
+      },
+      // `amount` is a raw-units string; sort it numerically like the table did.
+      sortValue: (row, key) =>
+        key === "amount"
+          ? Number(row.amount)
+          : (row as unknown as Record<string, string>)[key] ?? null,
+    }),
 
   exportCsv: (query: ListQuery = {}) => exportUrl("crypto-txs", query),
 };

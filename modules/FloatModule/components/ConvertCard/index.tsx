@@ -6,7 +6,7 @@ import TextField from "@/Components/TextField";
 import Select from "@/Components/Select";
 import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/ToastReducer";
-import { CONVERT_ASSETS, CONVERT_CHAINS } from "@/types/constants";
+import { CONVERT_ASSETS, CONVERT_CHAINS } from "../../constants";
 import type { ConvertQuote } from "../../types";
 import { poolBalances } from "@/mockData/custody";
 import { cx, formatMoney } from "@/utils/helper";

@@ -7,14 +7,15 @@ import TableCard from "@/Components/Table/Table_V2";
 import ExportButton from "@/Components/ExportButton";
 import Badge from "@/Components/Badge";
 import Icon from "@/Components/Icons";
-import useTableState from "@/customHooks/useTableState";
+import useServerTable from "@/customHooks/useServerTable";
+import apiKeysService from "./services/apiKeysService";
 import useCopyToClipboard from "@/customHooks/useCopyToClipboard";
 import { useAppDispatch } from "@/redux/hooks";
 import { openPopup } from "@/redux/reducers/PopUpsReducer";
 import { pushToast } from "@/redux/reducers/ToastReducer";
 import type { Column } from "@/types/global";
 import type { ApiKey } from "./types";
-import { apiKeys, apiKeyStats } from "@/mockData/apiKeys";
+import { apiKeyStats } from "@/mockData/apiKeys";
 import { DATASET_NOW } from "@/utils/Config";
 import { cx, formatDateTimeNumeric, formatNumber, relativeFrom, smoothSeries } from "@/utils/helper";
 import { buttonStyles } from "@/Components/Button";
@@ -25,11 +26,8 @@ export default function ApiKeys() {
   const dispatch = useAppDispatch();
   const { copy } = useCopyToClipboard();
 
-  const state = useTableState<ApiKey>({
-    rows: apiKeys,
-    searchFields: (row) => [row.prefix, row.label, row.scope, row.environment, row.state],
-    sortValue: (row, key) =>
-      (row as unknown as Record<string, string | number | null>)[key] ?? null,
+  const state = useServerTable<ApiKey>({
+    fetcher: apiKeysService.list,
   });
 
   const columns: Column<ApiKey>[] = [

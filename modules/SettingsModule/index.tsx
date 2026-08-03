@@ -9,7 +9,7 @@ import DetailGrid from "@/Components/DetailGrid";
 import useTheme from "@/customHooks/useTheme";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/ToastReducer";
-import { SETTINGS_TABS } from "@/types/constants";
+import { SETTINGS_TABS } from "./constants";
 import { Config } from "@/utils/Config";
 import { organizationInfo, profileInfo } from "@/mockData/settings";
 import { cx } from "@/utils/helper";

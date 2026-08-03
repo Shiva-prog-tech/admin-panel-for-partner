@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import PageHeader from "@/Components/PageHeader";
 import DateRangePicker from "@/Components/DateRangePicker";
 import StatCard from "@/Components/StatCard";
@@ -12,15 +12,16 @@ import ExportButton from "@/Components/ExportButton";
 import Badge from "@/Components/Badge";
 import Icon from "@/Components/Icons";
 import AddEndUserModal from "./components/AddEndUserModal";
-import useTableState from "@/customHooks/useTableState";
+import useServerTable from "@/customHooks/useServerTable";
+import endUsersService from "./services/endUsersService";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clearFilters, selectStatuses, toggleStatus } from "@/redux/reducers/FiltersReducer";
 import { openPopup } from "@/redux/reducers/PopUpsReducer";
 import { pushToast } from "@/redux/reducers/ToastReducer";
-import { END_USER_STATUSES } from "@/types/constants";
+import { END_USER_STATUSES } from "./constants";
 import type { Column } from "@/types/global";
 import type { EndUser } from "./types";
-import { endUsers as seededUsers, endUserStats } from "@/mockData/endUsers";
+import { endUserStats } from "@/mockData/endUsers";
 import { cx, formatDateTimeNumeric, formatNumber } from "@/utils/helper";
 import { buttonStyles } from "@/Components/Button";
 import { listingStyles } from "@/Components/ListingPage";
@@ -31,42 +32,15 @@ export default function EndUsers() {
   const dispatch = useAppDispatch();
   const selectedStatuses = useAppSelector(selectStatuses(RESOURCE));
 
-  const [created, setCreated] = useState<EndUser[]>([]);
   const [addOpen, setAddOpen] = useState(false);
 
-  const rows = useMemo(() => [...created, ...seededUsers], [created]);
+  // Search, status filter, sort and paging all resolve in the service now, so
+  // the page holds no copy of the dataset.
+  const list = useCallback(endUsersService.list, []);
 
-  const statusFilter = useMemo(() => {
-    if (!selectedStatuses.length) return undefined;
-    return (row: EndUser) => selectedStatuses.includes(row.status);
-  }, [selectedStatuses]);
-
-  const state = useTableState<EndUser>({
-    rows,
-    filter: statusFilter,
-    searchFields: (row) => [row.refId, row.status],
-    sortValue: (row, key) => {
-      switch (key) {
-        case "refId":
-          return row.refId;
-        case "cards":
-          return row.cards;
-        case "cardholders":
-          return row.cardholders;
-        case "cardTxs":
-          return row.cardTxs;
-        case "walletTxs":
-          return row.walletTxs;
-        case "deposited":
-          return row.deposited;
-        case "createdAt":
-          return row.createdAt;
-        case "status":
-          return row.status;
-        default:
-          return null;
-      }
-    },
+  const state = useServerTable<EndUser>({
+    fetcher: list,
+    status: selectedStatuses,
   });
 
   const columns: Column<EndUser>[] = [
@@ -259,8 +233,9 @@ export default function EndUsers() {
       <AddEndUserModal
         open={addOpen}
         onClose={() => setAddOpen(false)}
-        onCreate={(user) => {
-          setCreated((current) => [user, ...current]);
+        onCreate={async (user) => {
+          await endUsersService.create(user);
+          state.reload();
           dispatch(
             pushToast({
               tone: "success",

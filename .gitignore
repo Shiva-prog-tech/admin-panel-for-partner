@@ -18,6 +18,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# this project installs with yarn; a lockfile from another manager is a mistake
+package-lock.json
+pnpm-lock.yaml
+
 .env
 .env.local
 .env*.local

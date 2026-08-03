@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import PageHeader from "@/Components/PageHeader";
 import DateRangePicker from "@/Components/DateRangePicker";
 import StatCard from "@/Components/StatCard";
@@ -10,17 +10,14 @@ import RefCell from "@/Components/RefCell";
 import RowMenu from "@/Components/RowMenu";
 import ExportButton from "@/Components/ExportButton";
 import Badge from "@/Components/Badge";
-import useTableState from "@/customHooks/useTableState";
+import useServerTable from "@/customHooks/useServerTable";
+import transactionsService from "./services/transactionsService";
 import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/ToastReducer";
-import {
-  TX_STATUS_BUCKETS,
-  TX_STATUS_OPTIONS,
-  TX_TYPE_OPTIONS,
-} from "@/types/constants";
+import { TX_STATUS_OPTIONS, TX_TYPE_OPTIONS } from "./constants";
 import type { Column } from "@/types/global";
 import type { Transaction } from "./types";
-import { transactions, transactionStats } from "@/mockData/transactions";
+import { transactionStats } from "@/mockData/transactions";
 import { formatDateTimeNumeric, formatMoney, formatNumber, formatPercent } from "@/utils/helper";
 import { listingStyles } from "@/Components/ListingPage";
 
@@ -29,20 +26,9 @@ export default function Transactions() {
   const [type, setType] = useState("");
   const [status, setStatus] = useState("");
 
-  const filter = useMemo(() => {
-    if (!type && !status) return undefined;
-    // "Success" also covers rows the issuer reports as "Authorized".
-    const allowed = status ? TX_STATUS_BUCKETS[status] ?? [status] : null;
-    return (row: Transaction) =>
-      (!type || row.type === type) && (!allowed || allowed.includes(row.status));
-  }, [type, status]);
-
-  const state = useTableState<Transaction>({
-    rows: transactions,
-    filter,
-    searchFields: (row) => [row.refId, row.merchant, row.last4, row.status],
-    sortValue: (row, key) =>
-      (row as unknown as Record<string, string | number | null>)[key] ?? null,
+  const state = useServerTable<Transaction>({
+    fetcher: transactionsService.list,
+    filters: { type, status },
   });
 
   const columns: Column<Transaction>[] = [

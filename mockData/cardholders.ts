@@ -3,7 +3,8 @@
 // ===========================================================================
 import type { Cardholder, CardholderStatus } from "@/modules/CardholdersModule/types";
 import { smoothSeries } from "@/utils/helper";
-import { CARD_PRODUCTS, REJECTION_REASONS } from "@/types/constants";
+import { CARD_PRODUCTS } from "@/types/constants";
+import { REJECTION_REASONS } from "@/modules/CardholdersModule/constants";
 import { descendingStamps, hashSeed, pick, refIds, seededRandom, weighted } from "./seed";
 
 const FIRST_PAGE: Cardholder[] = [

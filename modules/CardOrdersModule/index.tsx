@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import PageHeader from "@/Components/PageHeader";
 import DateRangePicker from "@/Components/DateRangePicker";
 import StatCard from "@/Components/StatCard";
@@ -10,13 +10,14 @@ import RefCell from "@/Components/RefCell";
 import RowMenu from "@/Components/RowMenu";
 import ExportButton from "@/Components/ExportButton";
 import Badge from "@/Components/Badge";
-import useTableState from "@/customHooks/useTableState";
+import useServerTable from "@/customHooks/useServerTable";
+import cardOrdersService from "./services/cardOrdersService";
 import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/ToastReducer";
-import { CARD_ORDER_STATUSES } from "@/types/constants";
+import { CARD_ORDER_STATUSES } from "./constants";
 import type { Column, SelectOption } from "@/types/global";
 import type { CardOrder } from "./types";
-import { cardOrders, cardOrderStats } from "@/mockData/cardOrders";
+import { cardOrderStats } from "@/mockData/cardOrders";
 import { formatDateTimeNumeric, formatNumber } from "@/utils/helper";
 import { listingStyles } from "@/Components/ListingPage";
 
@@ -29,24 +30,9 @@ export default function CardOrders() {
   const dispatch = useAppDispatch();
   const [status, setStatus] = useState("");
 
-  const filter = useMemo(() => {
-    if (!status) return undefined;
-    return (row: CardOrder) => row.status === status;
-  }, [status]);
-
-  const state = useTableState<CardOrder>({
-    rows: cardOrders,
-    filter,
-    searchFields: (row) => [
-      row.order,
-      row.refId,
-      row.recipient,
-      row.country,
-      row.tracking,
-      row.status,
-    ],
-    sortValue: (row, key) =>
-      (row as unknown as Record<string, string | number | null>)[key] ?? null,
+  const state = useServerTable<CardOrder>({
+    fetcher: cardOrdersService.list,
+    filters: { status },
   });
 
   const columns: Column<CardOrder>[] = [

@@ -12,18 +12,16 @@ import ExportButton from "@/Components/ExportButton";
 import Badge from "@/Components/Badge";
 import Icon from "@/Components/Icons";
 import AddCardholderModal from "./components/AddCardholderModal";
-import useTableState from "@/customHooks/useTableState";
+import useServerTable from "@/customHooks/useServerTable";
+import cardholdersService from "./services/cardholdersService";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { clearFilters, selectStatuses, toggleStatus } from "@/redux/reducers/FiltersReducer";
 import { openPopup } from "@/redux/reducers/PopUpsReducer";
 import { pushToast } from "@/redux/reducers/ToastReducer";
-import { CARDHOLDER_STATUSES } from "@/types/constants";
+import { CARDHOLDER_STATUSES } from "./constants";
 import type { Column } from "@/types/global";
 import type { Cardholder } from "./types";
-import {
-  cardholders as seededCardholders,
-  cardholderStats,
-} from "@/mockData/cardholders";
+import { cardholderStats } from "@/mockData/cardholders";
 import { cx, formatDateTimeLong, formatNumber, share } from "@/utils/helper";
 import { buttonStyles } from "@/Components/Button";
 import { listingStyles } from "@/Components/ListingPage";
@@ -34,40 +32,11 @@ export default function Cardholders() {
   const dispatch = useAppDispatch();
   const selectedStatuses = useAppSelector(selectStatuses(RESOURCE));
 
-  const [created, setCreated] = useState<Cardholder[]>([]);
   const [addOpen, setAddOpen] = useState(false);
 
-  const rows = useMemo(() => [...created, ...seededCardholders], [created]);
-
-  const statusFilter = useMemo(() => {
-    if (!selectedStatuses.length) return undefined;
-    return (row: Cardholder) => selectedStatuses.includes(row.status);
-  }, [selectedStatuses]);
-
-  const state = useTableState<Cardholder>({
-    rows,
-    filter: statusFilter,
-    searchFields: (row) => [row.refId, row.product, row.status, row.reason],
-    sortValue: (row, key) => {
-      switch (key) {
-        case "refId":
-          return row.refId;
-        case "product":
-          return row.product;
-        case "status":
-          return row.status;
-        case "cards":
-          return row.cards;
-        case "wallets":
-          return row.wallets;
-        case "deposited":
-          return row.deposited;
-        case "createdAt":
-          return row.createdAt;
-        default:
-          return null;
-      }
-    },
+  const state = useServerTable<Cardholder>({
+    fetcher: cardholdersService.list,
+    status: selectedStatuses,
   });
 
   const columns: Column<Cardholder>[] = [
@@ -262,8 +231,9 @@ export default function Cardholders() {
       <AddCardholderModal
         open={addOpen}
         onClose={() => setAddOpen(false)}
-        onCreate={(cardholder) => {
-          setCreated((current) => [cardholder, ...current]);
+        onCreate={async (cardholder) => {
+          await cardholdersService.create(cardholder);
+          state.reload();
           dispatch(
             pushToast({
               tone: "success",

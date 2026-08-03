@@ -33,10 +33,28 @@ export const custodyService = {
   },
 
   poolBalances: (query: ListQuery = {}): Promise<Paginated<PoolBalance>> =>
-    fetchList<PoolBalance>("/custody/pool-balances", poolBalances, query),
+    fetchList<PoolBalance>("/custody/pool-balances", poolBalances, query, {
+      searchFields: (row) => [row.asset, row.chain],
+      filterFields: { asset: (row) => row.asset },
+      // `balance` is a raw-units string; sort it numerically like the table did.
+      sortValue: (row, key) =>
+        key === "balance"
+          ? Number(row.balance)
+          : (row as unknown as Record<string, string>)[key] ?? null,
+    }),
 
   withdrawals: (query: ListQuery = {}): Promise<Paginated<CustodyWithdrawal>> =>
-    fetchList<CustodyWithdrawal>("/custody/withdrawals", custodyWithdrawals, query),
+    fetchList<CustodyWithdrawal>("/custody/withdrawals", custodyWithdrawals, query, {
+      searchFields: (row) => [row.refId, row.asset, row.to, row.status],
+      filterFields: {
+        asset: (row) => row.asset,
+        status: (row) => row.status,
+      },
+      sortValue: (row, key) =>
+        key === "amount"
+          ? Number(row.amount)
+          : (row as unknown as Record<string, string>)[key] ?? null,
+    }),
 
   exportPoolBalances: (query: ListQuery = {}) =>
     exportUrl("custody/pool-balances", query),

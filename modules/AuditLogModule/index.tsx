@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import PageHeader from "@/Components/PageHeader";
 import DateRangePicker from "@/Components/DateRangePicker";
 import StatCard from "@/Components/StatCard";
@@ -8,17 +8,14 @@ import TableCard from "@/Components/Table/Table_V2";
 import SelectFilter from "@/Components/SelectFilter";
 import ExportButton from "@/Components/ExportButton";
 import Icon from "@/Components/Icons";
-import useTableState from "@/customHooks/useTableState";
-import { API_STATUS_OPTIONS } from "@/types/constants";
+import useServerTable from "@/customHooks/useServerTable";
+import auditLogService from "./services/auditLogService";
+import { API_STATUS_OPTIONS } from "./constants";
 import styles from "./AuditLogModule.module.scss";
 import type { Column } from "@/types/global";
 import type { ApiRequestLog, AuditEvent } from "./types";
-import {
-  apiRequests,
-  apiRequestStats,
-  matchesStatusBucket,
-} from "@/mockData/apiAuditLog";
-import { auditEvents, auditStats } from "@/mockData/auditLog";
+import { apiRequestStats } from "@/mockData/apiAuditLog";
+import { auditStats } from "@/mockData/auditLog";
 import { panelStyles } from "@/Components/PanelCard";
 import { listingStyles } from "@/Components/ListingPage";
 import {
@@ -46,17 +43,9 @@ export default function AuditLog() {
   const [bucket, setBucket] = useState("");
 
   // --- machine API requests -------------------------------------------------
-  const apiFilter = useMemo(() => {
-    if (!bucket) return undefined;
-    return (row: ApiRequestLog) => matchesStatusBucket(row.status, bucket);
-  }, [bucket]);
-
-  const requests = useTableState<ApiRequestLog>({
-    rows: apiRequests,
-    filter: apiFilter,
-    searchFields: (row) => [row.path, row.method, row.refId, String(row.status)],
-    sortValue: (row, key) =>
-      (row as unknown as Record<string, string | number>)[key] ?? null,
+  const requests = useServerTable<ApiRequestLog>({
+    fetcher: auditLogService.apiRequests,
+    filters: { status: bucket },
   });
 
   const requestColumns: Column<ApiRequestLog>[] = [
@@ -111,11 +100,8 @@ export default function AuditLog() {
   ];
 
   // --- admin activity -------------------------------------------------------
-  const events = useTableState<AuditEvent>({
-    rows: auditEvents,
-    searchFields: (row) => [row.actor, row.action, row.target, row.ip],
-    sortValue: (row, key) =>
-      (row as unknown as Record<string, string | number>)[key] ?? null,
+  const events = useServerTable<AuditEvent>({
+    fetcher: auditLogService.adminActivity,
   });
 
   const eventColumns: Column<AuditEvent>[] = [

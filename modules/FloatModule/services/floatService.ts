@@ -38,7 +38,15 @@ export const floatService = {
   },
 
   journal: (query: ListQuery = {}): Promise<Paginated<JournalEntry>> =>
-    fetchList<JournalEntry>("/float/journal", journalEntries, query),
+    fetchList<JournalEntry>("/float/journal", journalEntries, query, {
+      searchFields: (row) => [row.reference, row.reason, row.direction],
+      filterFields: {
+        direction: (row) => row.direction,
+        reason: (row) => row.reason,
+      },
+      sortValue: (row, key) =>
+        (row as unknown as Record<string, string | number>)[key] ?? null,
+    }),
 
   /** Prices a custody → float settlement without committing it. */
   async quote({ asset, chain, amount }: ConvertRequest): Promise<ConvertQuote> {

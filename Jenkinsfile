@@ -34,7 +34,7 @@ pipeline {
                     steps { sh 'yarn lint' }
                 }
                 stage('Typecheck') {
-                    steps { sh 'npx tsc --noEmit' }
+                    steps { sh 'yarn typecheck' }
                 }
             }
         }

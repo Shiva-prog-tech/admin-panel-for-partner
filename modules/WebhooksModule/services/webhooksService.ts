@@ -39,7 +39,13 @@ export const webhooksService = {
     fetchList<WebhookEndpoint>("/webhooks", webhookEndpoints, query),
 
   deliveries: (query: ListQuery = {}): Promise<Paginated<WebhookDelivery>> =>
-    fetchList<WebhookDelivery>("/webhooks/deliveries", webhookDeliveries, query),
+    fetchList<WebhookDelivery>("/webhooks/deliveries", webhookDeliveries, query, {
+      searchFields: (row) => [row.event, row.refId, row.status, row.error],
+      statusOf: (row) => row.status,
+      filterFields: { status: (row) => row.status },
+      sortValue: (row, key) =>
+        (row as unknown as Record<string, string | number | null>)[key] ?? null,
+    }),
 
   async replay(deliveryId: string): Promise<void> {
     if (Config.features.mockData) return;

@@ -12,7 +12,12 @@ import type { ApiKey } from "../types";
 
 export const apiKeysService = {
   list: (query: ListQuery = {}): Promise<Paginated<ApiKey>> =>
-    fetchList<ApiKey>("/api-keys", apiKeys, query),
+    fetchList<ApiKey>("/api-keys", apiKeys, query, {
+      searchFields: (row) => [row.prefix, row.label, row.scope, row.environment, row.state],
+      statusOf: (row) => row.state,
+      sortValue: (row, key) =>
+        (row as unknown as Record<string, string | number | null>)[key] ?? null,
+    }),
 
   exportCsv: (query: ListQuery = {}) => exportUrl("api-keys", query),
 };

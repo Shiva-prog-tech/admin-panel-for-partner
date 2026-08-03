@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import PageHeader from "@/Components/PageHeader";
 import DateRangePicker from "@/Components/DateRangePicker";
 import StatCard from "@/Components/StatCard";
@@ -11,13 +11,14 @@ import RowMenu from "@/Components/RowMenu";
 import ExportButton from "@/Components/ExportButton";
 import Badge from "@/Components/Badge";
 import Icon from "@/Components/Icons";
-import useTableState from "@/customHooks/useTableState";
+import useServerTable from "@/customHooks/useServerTable";
+import cardsService from "./services/cardsService";
 import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/ToastReducer";
-import { CARD_STATUSES } from "@/types/constants";
+import { CARD_STATUSES } from "./constants";
 import type { Column, SelectOption } from "@/types/global";
 import type { Card } from "./types";
-import { cards, cardStats } from "@/mockData/cards";
+import { cardStats } from "@/mockData/cards";
 import { cx, formatDateTimeNumeric, formatMoneyPlain, formatNumber } from "@/utils/helper";
 import { buttonStyles } from "@/Components/Button";
 import { listingStyles } from "@/Components/ListingPage";
@@ -31,17 +32,9 @@ export default function Cards() {
   const dispatch = useAppDispatch();
   const [status, setStatus] = useState("");
 
-  const filter = useMemo(() => {
-    if (!status) return undefined;
-    return (row: Card) => row.status === status;
-  }, [status]);
-
-  const state = useTableState<Card>({
-    rows: cards,
-    filter,
-    searchFields: (row) => [row.refId, row.cardNo, row.last4, row.product, row.status],
-    sortValue: (row, key) =>
-      (row as unknown as Record<string, string | number | null>)[key] ?? null,
+  const state = useServerTable<Card>({
+    fetcher: cardsService.list,
+    filters: { status },
   });
 
   const notify = (row: Card, title: string) =>

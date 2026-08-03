@@ -11,16 +11,14 @@ import ExportButton from "@/Components/ExportButton";
 import Badge from "@/Components/Badge";
 import Icon from "@/Components/Icons";
 import WebhookConfigCard from "./components/WebhookConfigCard";
-import useTableState from "@/customHooks/useTableState";
+import useServerTable from "@/customHooks/useServerTable";
+import webhooksService from "./services/webhooksService";
 import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/ToastReducer";
-import { DELIVERY_STATUS_OPTIONS } from "@/types/constants";
+import { DELIVERY_STATUS_OPTIONS } from "./constants";
 import type { Column } from "@/types/global";
 import type { WebhookDelivery } from "./types";
-import {
-  webhookDeliveries,
-  deliveryStats,
-} from "@/mockData/webhookDeliveries";
+import { deliveryStats } from "@/mockData/webhookDeliveries";
 import { webhookStats } from "@/mockData/webhooks";
 import { cx, formatDateTimeNumeric, formatNumber } from "@/utils/helper";
 import { buttonStyles } from "@/Components/Button";
@@ -31,17 +29,9 @@ export default function Webhooks() {
   const dispatch = useAppDispatch();
   const [status, setStatus] = useState("");
 
-  const filter = useMemo(() => {
-    if (!status) return undefined;
-    return (row: WebhookDelivery) => row.status === status;
-  }, [status]);
-
-  const state = useTableState<WebhookDelivery>({
-    rows: webhookDeliveries,
-    filter,
-    searchFields: (row) => [row.event, row.refId, row.status, row.error],
-    sortValue: (row, key) =>
-      (row as unknown as Record<string, string | number>)[key] ?? null,
+  const state = useServerTable<WebhookDelivery>({
+    fetcher: webhooksService.deliveries,
+    filters: { status },
   });
 
   const columns: Column<WebhookDelivery>[] = [

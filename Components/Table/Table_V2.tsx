@@ -5,13 +5,16 @@ import DataTable from "./index";
 import SearchField from "@/Components/SearchField";
 import PerPageSelect from "@/Components/PerPageSelect";
 import Pagination from "@/Components/Pagination";
-import type { Column } from "@/types/global";
-import type { TableState } from "@/customHooks/useTableState";
+import type { Column, TableState } from "@/types/global";
 import { formatNumber } from "@/utils/helper";
 import styles from "./Table.module.scss";
 
 interface TableCardProps<T> {
-  state: TableState<T>;
+  /**
+   * Accepts the extra fields `useServerTable` adds on top of `TableState`, so a
+   * table can tell "still fetching" apart from "genuinely empty".
+   */
+  state: TableState<T> & { loading?: boolean; error?: string | null };
   columns: Column<T>[];
   rowKey: (row: T) => string;
   searchPlaceholder?: string;
@@ -42,8 +45,15 @@ export default function TableCard<T>({
   emptyText,
   unit = "results",
 }: TableCardProps<T>) {
+  // Every table is service-driven, so the first paint has no rows yet. Without
+  // these the empty state claims "nothing to show" while the request is still in
+  // flight — imperceptible against the fixtures, but a lie against a real API,
+  // where it would read as a broken screen for the whole round trip.
+  const failed = Boolean(state.error);
+  const pending = Boolean(state.loading) && state.pageRows.length === 0;
+
   return (
-    <section className={styles.shell}>
+    <section className={styles.shell} aria-busy={pending || undefined}>
       <div className={styles.toolbar}>
         <div className={styles.toolbarLeft}>
           <SearchField
@@ -64,8 +74,16 @@ export default function TableCard<T>({
         sort={state.sort}
         onSort={state.toggleSort}
         minWidth={minWidth}
-        emptyTitle={emptyTitle}
-        emptyText={emptyText}
+        emptyTitle={
+          failed ? "Could not load this list" : pending ? "Loading…" : emptyTitle
+        }
+        emptyText={
+          failed
+            ? (state.error as string)
+            : pending
+              ? "Fetching results from the partner API."
+              : emptyText
+        }
       />
 
       <div className={styles.footer}>

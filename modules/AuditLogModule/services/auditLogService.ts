@@ -8,37 +8,26 @@
 import { fetchList, exportUrl, type ListQuery } from "@/services/list";
 import { apiRequests, matchesStatusBucket } from "@/mockData/apiAuditLog";
 import { auditEvents } from "@/mockData/auditLog";
-import { Config } from "@/utils/Config";
 import type { Paginated } from "@/types/global";
 import type { ApiRequestLog, AuditEvent } from "../types";
 
-export interface ApiRequestQuery extends ListQuery {
-  /** "" | "2xx" | "400" | "401" | "500" */
-  statusBucket?: string;
-}
-
 export const auditLogService = {
-  async apiRequests(
-    query: ApiRequestQuery = {}
-  ): Promise<Paginated<ApiRequestLog>> {
-    const { statusBucket, ...rest } = query;
-
-    // Mock mode filters locally; the API takes the bucket as a query param.
-    if (Config.features.mockData) {
-      const rows = statusBucket
-        ? apiRequests.filter((r) => matchesStatusBucket(r.status, statusBucket))
-        : apiRequests;
-      return fetchList<ApiRequestLog>("/audit-log/api-requests", rows, rest);
-    }
-
-    return fetchList<ApiRequestLog>("/audit-log/api-requests", apiRequests, {
-      ...rest,
-      ...(statusBucket ? { status: [statusBucket] } : {}),
-    });
-  },
+  apiRequests: (query: ListQuery = {}): Promise<Paginated<ApiRequestLog>> =>
+    fetchList<ApiRequestLog>("/audit-log/api-requests", apiRequests, query, {
+      searchFields: (row) => [row.path, row.method, row.refId, String(row.status)],
+      // `filters.status` is a bucket ("2xx", "400", "401", "500"), and "2xx" /
+      // "500" are ranges — so it cannot be expressed as a field match.
+      predicate: (row, q) => matchesStatusBucket(row.status, q.filters?.status ?? ""),
+      sortValue: (row, key) =>
+        (row as unknown as Record<string, string | number>)[key] ?? null,
+    }),
 
   adminActivity: (query: ListQuery = {}): Promise<Paginated<AuditEvent>> =>
-    fetchList<AuditEvent>("/audit-log", auditEvents, query),
+    fetchList<AuditEvent>("/audit-log", auditEvents, query, {
+      searchFields: (row) => [row.actor, row.action, row.target, row.ip],
+      sortValue: (row, key) =>
+        (row as unknown as Record<string, string | number>)[key] ?? null,
+    }),
 
   exportCsv: (query: ListQuery = {}) => exportUrl("audit-log/api-requests", query),
 };

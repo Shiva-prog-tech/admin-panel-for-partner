@@ -22,18 +22,21 @@ const AUTHORED: Array<Omit<ApiRequestLog, "id">> = [
 
 const TOTAL = 240;
 
+// Weights are tuned so every option in API_STATUS_OPTIONS returns rows — a
+// filter that can only ever render an empty table reads as a broken screen.
+// 503 exists so the "500" bucket is a range (>= 500), not an exact match.
 const PATHS: Array<{ method: HttpMethod; path: string; statuses: number[]; weights: number[] }> = [
-  { method: "GET", path: "/api/v1/crypto/transactions?limit=100", statuses: [200, 401], weights: [96, 4] },
-  { method: "GET", path: "/api/v1/crypto/balances/summary", statuses: [200, 500], weights: [97, 3] },
+  { method: "GET", path: "/api/v1/crypto/transactions?limit=100", statuses: [200, 401], weights: [90, 10] },
+  { method: "GET", path: "/api/v1/crypto/balances/summary", statuses: [200, 500, 503], weights: [88, 6, 6] },
   { method: "GET", path: "/api/v1/crypto/quote-usd?asset=USDT&amount=0", statuses: [400], weights: [100] },
-  { method: "GET", path: "/api/v1/cardholders/status", statuses: [200, 401], weights: [94, 6] },
+  { method: "GET", path: "/api/v1/cardholders/status", statuses: [200, 401], weights: [87, 13] },
   { method: "POST", path: "/api/v1/cardholders", statuses: [202, 400], weights: [88, 12] },
   { method: "GET", path: "/api/v1/cards", statuses: [200], weights: [100] },
-  { method: "POST", path: "/api/v1/cards/topup", statuses: [200, 400, 500], weights: [80, 15, 5] },
+  { method: "POST", path: "/api/v1/cards/topup", statuses: [200, 400, 500, 503], weights: [78, 15, 4, 3] },
   { method: "GET", path: "/api/v1/cards/transactions?limit=50", statuses: [200], weights: [100] },
   { method: "POST", path: "/api/v1/crypto/settle", statuses: [200, 400], weights: [90, 10] },
   { method: "GET", path: "/api/v1/float/balance", statuses: [200], weights: [100] },
-  { method: "PATCH", path: "/api/v1/cards/freeze", statuses: [200, 401], weights: [92, 8] },
+  { method: "PATCH", path: "/api/v1/cards/freeze", statuses: [200, 401], weights: [84, 16] },
   { method: "GET", path: "/api/v1/end-users?limit=100", statuses: [200], weights: [100] },
 ];
 

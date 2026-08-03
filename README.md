@@ -23,24 +23,28 @@ sidebar line-art are all inline SVG, so the panel renders identically offline.
 
 ## Getting started
 
+This project uses **yarn** (1.x), matching the [Jenkinsfile](Jenkinsfile). Use
+`yarn`, not `npm` — mixing the two produces a competing `package-lock.json` and
+CI installs with `--frozen-lockfile`, so a stale `yarn.lock` fails the build.
+
 ```bash
-npm install
+yarn install
 cp .env.development .env   # optional: the defaults already work
-npm run dev                # http://localhost:3000
+yarn dev                   # http://localhost:3000
 ```
 
-Other scripts: `npm run build`, `npm start`, `npm run lint`, `npm run typecheck`.
+Other scripts: `yarn build`, `yarn start`, `yarn lint`, `yarn typecheck`.
 
 ```bash
-npm run verify   # typecheck + check:css + lint — run this before committing
+yarn verify           # typecheck + lint — before committing
 ```
 
-`npm run check:css` is the guard that matters during styling work: a mistyped
-CSS Module key resolves to `undefined`, so React drops the attribute and the
-element renders unstyled with a green `tsc`, `eslint` **and** `next build`. The
-guard resolves every `styles.*` reference against the sheet that defines it, and
-`--unused` lists rules nothing references. It caught four such defects during the
-CSS Modules migration.
+Two failure modes get past `verify`, so check them by eye when you touch either
+area. A mistyped CSS Module key (`styles.valuSm`) resolves to `undefined`, so
+React drops the attribute and the element renders unstyled with a green `tsc`,
+`eslint` **and** `next build`. Likewise a page passing `filters: { x }` to a
+service that does not handle `x`: the dropdown moves, the table does not, and
+both sides type-check in isolation.
 
 ## Structure
 
@@ -90,7 +94,7 @@ modules/                        # each: index.tsx + <Name>Module.module.scss
 ├── SignInModule/ SignUpModule/
 └── notificationdropdown/ ProfileDropdownModule/   # NavBar panels
 
-customHooks/     useTableState, useClickOutside, useTheme, useSignOut,
+customHooks/     useServerTable, useClickOutside, useTheme, useSignOut,
                  useCopyToClipboard, useDebounce, useHotkey, useMediaQuery
 redux/           store.ts, provider.tsx, hooks/,
                  reducers/{Auth,Config,Filters,PopUps,Toast}Reducer.ts
@@ -101,12 +105,11 @@ utils/           axios, helper, Config, session, coins, CountryData,
                  ImageRelativePaths            # leaf layer, no app imports
 mockData/        seeded fixtures for every resource (dev-only)
 types/           global.ts, constants.ts   # cross-cutting only
-                 (record types live in modules/*/types.ts)
+                 (per-module types.ts + constants.ts live in modules/*)
 libs/            firebase.ts   # optional push wiring, no hard dependency
 styles/          _index.scss, App.scss, globals.css, media.scss, mixins.scss
                  # App.scss is utilities only (2KB); globals.css holds tokens
 public/          assets/{svgs,pngs,images}, terms-and-conditions.html
-scripts/         restructure.sh, check-module-classes.mjs
 config           next.config.ts, postcss.config.mjs, tsconfig.json,
                  eslint.config.mjs, .env.development/.production, Jenkinsfile
 ```
@@ -140,12 +143,39 @@ the `NEXT_PUBLIC_ENABLE_MOCK_DATA` switch and the `{ rows, total, page,
 pageSize }` contract, so no component ever imports an HTTP client and the flag is
 checked in exactly one place.
 
-> **Wiring status.** `auth.service.ts` is load-bearing — sign in, sign up and
-> sign out all run through it. The resource services are the prepared seam and
-> are **not yet on the live path**: the listing pages still read
-> `utils/mockData/*` directly and paginate client-side through `useTableState`.
-> Moving them over means switching to server-driven pagination, which is a
-> deliberate follow-up rather than a drop-in.
+### Wiring status
+
+| Surface | Path |
+| ------- | ---- |
+| `auth.service.ts` | live — sign in, sign up, sign out |
+| All 13 listing tables | live — `xService.list()` via `useServerTable` |
+
+Every table now asks its service for one page. No page imports a fixture for its
+rows; `mockData/*` is reached only through `fetchList`, and only while
+`NEXT_PUBLIC_ENABLE_MOCK_DATA` is on. Fixtures are still imported directly for
+stat cards and charts, which are not paginated.
+
+Three filter shapes are in use, in order of preference:
+
+| Shape | Use it when | Example |
+| ----- | ----------- | ------- |
+| `statusOf` + `query.status[]` | multi-select status popover | End users |
+| `filterFields: { key }` | a dropdown matches one field exactly | Crypto txs `asset`/`dir`/`reason` |
+| `predicate` | the axis is a range or a bucket | Transactions `Success` also covers `Authorized`; audit log `2xx`, `>= 500` |
+
+To add a listing:
+
+1. Give its service a `MockShape` so `fetchList` filters and sorts the fixture
+   the way the API will — see
+   [endUsersService](modules/EndUsersModule/services/endUsersService.ts).
+2. Call `useServerTable({ fetcher: xService.list, status, filters })`.
+   It adds `loading`, `error` and `reload` to the `TableState` `<TableCard>` takes.
+3. Route writes through the service (`create`) and call `state.reload()` rather
+   than holding an optimistic copy in component state.
+4. Verify each filter axis by hand in the browser. Every key in the page's
+   `filters` object must appear in the service's `filterFields` or be read by its
+   `predicate`; a key only one side knows about is a silent no-op that still
+   type-checks.
 
 ## Types
 
@@ -159,6 +189,14 @@ Same two-tier split as the services:
   and the UI vocabulary (`Theme`, `BadgeTone`, `SortDir`, `NavItem`, …).
 - **`modules/<X>/types.ts`** holds that module's own record types — the same
   convention as the reference's `Components/FilmoraPopup/types.ts`.
+- **`modules/<X>/constants.ts`** holds that module's filter options and status
+  vocabularies, for the same reason: a dropdown's options belong with the screen
+  that renders them.
+
+`types/constants.ts` keeps only what several places read — `NAV_ITEMS`,
+`STATUS_TONES` (the `Badge` tone map), `PAGE_SIZES`, `DATE_RANGES`,
+`DIRECTION_OPTIONS` (Float *and* Crypto txs), `CARD_PRODUCTS` (both fixtures),
+`AUTH_ROUTES`/`PASSWORD_RULES`/`EMAIL_PATTERN` and the app strings.
 
 A module refers to its own types relatively (`from "../types"`), never by
 absolute path.
@@ -194,14 +232,17 @@ match byte for byte — no hydration warnings and stable screenshots.
 Flip the flag to `false` and point `NEXT_PUBLIC_API_BASE_URL` at your backoffice
 API. `services/list.ts` already speaks the paginated contract
 (`{ rows, total, page, pageSize }`), and each module service is a thin wrapper
-over it — so switching is a config change plus moving the listing pages onto
-their service (see the wiring note above).
+over it — so switching is a config change alone: every listing already goes
+through a service (see the wiring note above).
 
 ## Interaction notes
 
 - `⌘K` / `Ctrl+K` opens the command palette; `Esc` closes any overlay.
-- Tables search, sort (click a header), filter by status and paginate entirely
-  client-side via `useTableState` — swap the body for server paging later without
-  touching the pages.
+- Tables search (debounced 250ms), sort (click a header), filter and paginate
+  through their service via `useServerTable`, which holds only the current page
+  and discards out-of-order responses.
+- While a page is in flight the table says so instead of showing its empty state,
+  and a failed fetch shows the error in the same slot — otherwise a slow or down
+  API renders as "nothing to show", which reads as a broken screen.
 - **Export** builds a CSV in the browser from the current page of rows.
 - The sidebar collapses behind a scrim below 1080px.

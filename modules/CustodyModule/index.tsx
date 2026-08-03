@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import PageHeader from "@/Components/PageHeader";
 import DateRangePicker from "@/Components/DateRangePicker";
@@ -13,14 +13,12 @@ import RowMenu from "@/Components/RowMenu";
 import CoinIcon from "@/Components/CoinIcon";
 import Badge from "@/Components/Badge";
 import Icon from "@/Components/Icons";
-import useTableState from "@/customHooks/useTableState";
+import useServerTable from "@/customHooks/useServerTable";
+import custodyService from "./services/custodyService";
 import useCopyToClipboard from "@/customHooks/useCopyToClipboard";
 import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/ToastReducer";
-import {
-  CUSTODY_ASSET_OPTIONS,
-  WITHDRAWAL_STATUS_OPTIONS,
-} from "@/types/constants";
+import { CUSTODY_ASSET_OPTIONS, WITHDRAWAL_STATUS_OPTIONS } from "./constants";
 import type { Column } from "@/types/global";
 import type { CustodyWithdrawal, PoolBalance } from "./types";
 import { buttonStyles } from "@/Components/Button";
@@ -30,9 +28,7 @@ import { listingStyles } from "@/Components/ListingPage";
 import {
   custodyAssetTiles,
   custodyStats,
-  custodyWithdrawals,
   feeSchedule,
-  poolBalances,
 } from "@/mockData/custody";
 import { cx,
   formatDateTimeNumeric,
@@ -55,19 +51,9 @@ export default function Custody() {
   };
 
   // --- tenant pool balances -------------------------------------------------
-  const poolFilter = useMemo(() => {
-    if (!poolAsset) return undefined;
-    return (row: PoolBalance) => row.asset === poolAsset;
-  }, [poolAsset]);
-
-  const pools = useTableState<PoolBalance>({
-    rows: poolBalances,
-    filter: poolFilter,
-    searchFields: (row) => [row.asset, row.chain],
-    sortValue: (row, key) =>
-      key === "balance"
-        ? Number(row.balance)
-        : (row as unknown as Record<string, string>)[key] ?? null,
+  const pools = useServerTable<PoolBalance>({
+    fetcher: custodyService.poolBalances,
+    filters: { asset: poolAsset },
   });
 
   const poolColumns: Column<PoolBalance>[] = [
@@ -104,20 +90,9 @@ export default function Custody() {
   ];
 
   // --- withdrawals ---------------------------------------------------------
-  const wdFilter = useMemo(() => {
-    if (!wdAsset && !wdStatus) return undefined;
-    return (row: CustodyWithdrawal) =>
-      (!wdAsset || row.asset === wdAsset) && (!wdStatus || row.status === wdStatus);
-  }, [wdAsset, wdStatus]);
-
-  const withdrawals = useTableState<CustodyWithdrawal>({
-    rows: custodyWithdrawals,
-    filter: wdFilter,
-    searchFields: (row) => [row.refId, row.asset, row.to, row.status],
-    sortValue: (row, key) =>
-      key === "amount"
-        ? Number(row.amount)
-        : (row as unknown as Record<string, string>)[key] ?? null,
+  const withdrawals = useServerTable<CustodyWithdrawal>({
+    fetcher: custodyService.withdrawals,
+    filters: { asset: wdAsset, status: wdStatus },
   });
 
   const withdrawalColumns: Column<CustodyWithdrawal>[] = [

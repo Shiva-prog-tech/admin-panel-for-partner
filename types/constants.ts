@@ -102,48 +102,6 @@ export const DEFAULT_RANGE_ID = "7d";
 // ---------------------------------------------------------------------------
 // Filter option lists — one per dropdown in the spec
 // ---------------------------------------------------------------------------
-export const END_USER_STATUSES = [
-  "Active",
-  "Invited",
-  "Suspended",
-  "Closed",
-] as const;
-
-export const CARDHOLDER_STATUSES = ["Approved", "Pending", "Rejected"] as const;
-
-export const CARD_STATUSES = ["Normal", "Pending", "Frozen"] as const;
-
-export const TX_TYPE_OPTIONS: SelectOption[] = [
-  { value: "", label: "All types" },
-  { value: "purchase", label: "Purchase" },
-  { value: "refund", label: "Refund" },
-  { value: "auth", label: "Authorization" },
-];
-
-export const TX_STATUS_OPTIONS: SelectOption[] = [
-  { value: "", label: "All statuses" },
-  { value: "Success", label: "Success" },
-  { value: "Pending", label: "Pending" },
-  { value: "Failed", label: "Failed" },
-];
-
-/** "Authorized" rows belong to the Success bucket when filtering. */
-export const TX_STATUS_BUCKETS: Record<string, string[]> = {
-  Success: ["Success", "Authorized"],
-  Pending: ["Pending"],
-  Failed: ["Failed"],
-};
-
-export const CARD_ORDER_STATUSES = ["Pending", "Shipped", "Delivered"] as const;
-
-export const CRYPTO_ASSET_OPTIONS: SelectOption[] = [
-  { value: "", label: "All assets" },
-  { value: "USDT", label: "USDT" },
-  { value: "USDC", label: "USDC" },
-  { value: "TRX", label: "TRX" },
-  { value: "BTC", label: "BTC" },
-  { value: "ETH", label: "ETH" },
-];
 
 export const DIRECTION_OPTIONS: SelectOption[] = [
   { value: "", label: "All" },
@@ -151,71 +109,11 @@ export const DIRECTION_OPTIONS: SelectOption[] = [
   { value: "debit", label: "Debit" },
 ];
 
-export const CRYPTO_REASON_OPTIONS: SelectOption[] = [
-  { value: "", label: "All reasons" },
-  { value: "deposit", label: "Deposit" },
-  { value: "withdrawal", label: "Withdrawal" },
-  { value: "settlement", label: "Settlement" },
-  { value: "refund", label: "Refund" },
-];
-
-export const WITHDRAWAL_STATUS_OPTIONS: SelectOption[] = [
-  { value: "", label: "All statuses" },
-  { value: "Pending", label: "Pending" },
-  { value: "Processing", label: "Processing" },
-  { value: "Approved", label: "Approved" },
-  { value: "Completed", label: "Completed" },
-  { value: "Failed", label: "Failed" },
-];
-
-export const CUSTODY_ASSET_OPTIONS: SelectOption[] = [
-  { value: "", label: "All assets" },
-  { value: "USDT", label: "USDT" },
-  { value: "USDC", label: "USDC" },
-  { value: "TRX", label: "TRX" },
-  { value: "BTC", label: "BTC" },
-];
-
-export const JOURNAL_REASON_OPTIONS: SelectOption[] = [
-  { value: "", label: "All reasons" },
-  { value: "prefund", label: "Prefund" },
-  { value: "crypto_settlement", label: "Crypto settlement" },
-  { value: "card_topup", label: "Card top-up" },
-  { value: "card_topup_refund", label: "Card top-up refund" },
-  { value: "card_issuance", label: "Card issuance" },
-];
-
-export const DELIVERY_STATUS_OPTIONS: SelectOption[] = [
-  { value: "", label: "All" },
-  { value: "Delivered", label: "Delivered" },
-  { value: "Failed", label: "Failed" },
-  { value: "Pending", label: "Pending" },
-];
-
-export const API_STATUS_OPTIONS: SelectOption[] = [
-  { value: "", label: "All" },
-  { value: "2xx", label: "2xx" },
-  { value: "400", label: "400" },
-  { value: "401", label: "401" },
-  { value: "500", label: "500" },
-];
-
-/** Assets and chains offered by the custody → float converter. */
-export const CONVERT_ASSETS = ["BTC", "ETH", "USDT", "USDC", "TRX", "MATIC"] as const;
-export const CONVERT_CHAINS = ["eth", "tron", "polygon"] as const;
-
-export const REJECTION_REASONS = [
-  "An issue was detected with the document and verification could not be completed",
-  "The applicant uploaded screenshots instead of photos or scans.  |  [PASSPORT] The applicant uploaded screenshots instead of photos",
-  "The type of residence permit is not supported.",
-  "The document has expired.",
-  "[SELFIE] The selfie does not match the submitted document.",
-] as const;
-
+/** Card products the portal issues against — shared by the cardholder and card fixtures. */
 export const CARD_PRODUCTS = ["prod_111059", "prod_111031"] as const;
 
 // ---------------------------------------------------------------------------
-// Authentication
+// Authentication — read by AuthWrapper, useSignOut and both auth screens
 // ---------------------------------------------------------------------------
 export const AUTH_ROUTES = {
   signIn: "/sign-in",
@@ -242,10 +140,3 @@ export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export const LEGAL_LINE = "© 2025 Travls.io. All rights reserved.";
 
-export const SETTINGS_TABS = [
-  { id: "general", label: "General", icon: "settings" },
-  { id: "team", label: "Team", icon: "users" },
-  { id: "branding", label: "Branding", icon: "diamond" },
-  { id: "notifications", label: "Notifications", icon: "bell" },
-  { id: "security", label: "Security", icon: "shield" },
-] as const;

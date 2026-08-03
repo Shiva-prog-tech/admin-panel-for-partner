@@ -10,16 +10,15 @@ import ExportButton from "@/Components/ExportButton";
 import AreaChart from "@/Components/Charts/AreaChart";
 import Badge from "@/Components/Badge";
 import ConvertCard from "./components/ConvertCard";
-import useTableState from "@/customHooks/useTableState";
+import useServerTable from "@/customHooks/useServerTable";
+import floatService from "./services/floatService";
 import { useAppSelector } from "@/redux/hooks";
-import {
-  DIRECTION_OPTIONS,
-  JOURNAL_REASON_OPTIONS,
-} from "@/types/constants";
+import { DIRECTION_OPTIONS } from "@/types/constants";
+import { JOURNAL_REASON_OPTIONS } from "./constants";
 import type { Column } from "@/types/global";
 import type { JournalEntry } from "./types";
 import { floatSummary } from "@/mockData/dashboard";
-import { journalEntries, floatStats } from "@/mockData/floatLedger";
+import { floatStats } from "@/mockData/floatLedger";
 import { custodySummaryLine } from "@/mockData/custody";
 import { panelStyles } from "@/Components/PanelCard";
 import { listingStyles } from "@/Components/ListingPage";
@@ -37,19 +36,9 @@ export default function Float() {
   const [direction, setDirection] = useState("");
   const [reason, setReason] = useState("");
 
-  const filter = useMemo(() => {
-    if (!direction && !reason) return undefined;
-    return (row: JournalEntry) =>
-      (!direction || row.direction === direction) &&
-      (!reason || row.reason === reason);
-  }, [direction, reason]);
-
-  const state = useTableState<JournalEntry>({
-    rows: journalEntries,
-    filter,
-    searchFields: (row) => [row.reference, row.reason, row.direction],
-    sortValue: (row, key) =>
-      (row as unknown as Record<string, string | number>)[key] ?? null,
+  const state = useServerTable<JournalEntry>({
+    fetcher: floatService.journal,
+    filters: { direction, reason },
   });
 
   const columns: Column<JournalEntry>[] = [

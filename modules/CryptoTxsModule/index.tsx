@@ -11,17 +11,15 @@ import RowMenu from "@/Components/RowMenu";
 import ExportButton from "@/Components/ExportButton";
 import CoinIcon from "@/Components/CoinIcon";
 import Badge from "@/Components/Badge";
-import useTableState from "@/customHooks/useTableState";
+import useServerTable from "@/customHooks/useServerTable";
+import cryptoTxsService from "./services/cryptoTxsService";
 import { useAppDispatch } from "@/redux/hooks";
 import { pushToast } from "@/redux/reducers/ToastReducer";
-import {
-  CRYPTO_ASSET_OPTIONS,
-  CRYPTO_REASON_OPTIONS,
-  DIRECTION_OPTIONS,
-} from "@/types/constants";
+import { DIRECTION_OPTIONS } from "@/types/constants";
+import { CRYPTO_ASSET_OPTIONS, CRYPTO_REASON_OPTIONS } from "./constants";
 import type { Column } from "@/types/global";
 import type { CryptoTx } from "./types";
-import { cryptoTxs, cryptoStats } from "@/mockData/cryptoTxs";
+import { cryptoStats } from "@/mockData/cryptoTxs";
 import { explorerLink } from "@/utils/coins";
 import { formatDateTimeNumeric, formatNumber, truncateMiddle } from "@/utils/helper";
 import { tagStyles } from "@/Components/Tag";
@@ -42,22 +40,9 @@ export default function CryptoTxs() {
   const [dir, setDir] = useState("");
   const [reason, setReason] = useState("");
 
-  const filter = useMemo(() => {
-    if (!asset && !dir && !reason) return undefined;
-    return (row: CryptoTx) =>
-      (!asset || row.asset === asset) &&
-      (!dir || row.dir === dir) &&
-      (!reason || row.reason === reason);
-  }, [asset, dir, reason]);
-
-  const state = useTableState<CryptoTx>({
-    rows: cryptoTxs,
-    filter,
-    searchFields: (row) => [row.refId, row.txHash, row.asset, row.chain, row.reason],
-    sortValue: (row, key) =>
-      key === "amount"
-        ? Number(row.amount)
-        : (row as unknown as Record<string, string>)[key] ?? null,
+  const state = useServerTable<CryptoTx>({
+    fetcher: cryptoTxsService.list,
+    filters: { asset, dir, reason },
   });
 
   const columns: Column<CryptoTx>[] = [
